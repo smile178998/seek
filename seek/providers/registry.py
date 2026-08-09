@@ -1,0 +1,99 @@
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+from ..config import Settings, get_settings
+from .base import Provider
+from .builtin import BUILTIN_FACTORIES
+from .declarative import DeclarativeProvider, build_provider_info
+from .holehe_bridge import load_holehe_providers
+
+log = logging.getLogger(__name__)
+
+
+def load_definition_files(directory: Path) -> list[tuple[Path, dict[str, Any]]]:
+    specs: list[tuple[Path, dict[str, Any]]] = []
+    if not directory.exists():
+        log.warning("规则目录不存在: %s", directory)
+        return specs
+    for path in sorted(directory.glob("*.y*ml")):
+        try:
+            spec = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except yaml.YAMLError as exc:
+            log.error("规则文件解析失败 %s: %s", path.name, exc)
+            continue
+        if not isinstance(spec, dict):
+            log.error("规则文件格式不正确（顶层需为映射）: %s", path.name)
+            continue
+        specs.append((path, spec))
+    return specs
+
+
+def load_providers(settings: Settings | None = None) -> list[Provider]:
+    """加载检测模块：内置 Python 模块 + definitions 目录下的 YAML 规则。
+
+    默认 scan_profile=reliable 时只保留白名单模块，减少大量 unknown/失败噪声。
+    """
+    settings = settings or get_settings()
+    providers: list[Provider] = [factory() for factory in BUILTIN_FACTORIES]
+
+    if settings.enable_holehe and settings.normalize_profile(None, kind="scan") == "full":
+        disabled = settings.disabled_holehe()
+        for provider in load_holehe_providers():
+            short = provider.info.name
+            if short.startswith("holehe_"):
+                short = short[len("holehe_") :]
+            if short in disabled:
+                continue
+            providers.append(provider)
+        if disabled:
+            log.info("已按禁用清单跳过 %d 个 holehe 模块", len(disabled))
+
+    for path, spec in load_definition_files(settings.definitions_dir):
+        info = build_provider_info(spec, path.stem)
+        if not info.enabled:
+            log.debug("规则已禁用，跳过: %s", info.name)
+            continue
+        if "request" not in spec:
+            log.error("规则缺少 request 段: %s", path.name)
+            continue
+        providers.append(DeclarativeProvider(info, spec))
+
+    profile = settings.normalize_profile(None, kind="scan")
+    if profile == "reliable":
+        allow = settings.reliable_modules()
+        if allow:
+            before = len(providers)
+            providers = [p for p in providers if p.info.name.lower() in allow]
+            log.info("可靠模式：%d/%d 个模块", len(providers), before)
+
+    providers.sort(key=lambda p: (p.info.category, p.info.name))
+    return providers
+
+
+def filter_providers(
+    providers: list[Provider],
+    only: list[str] | None = None,
+    exclude: list[str] | None = None,
+) -> list[Provider]:
+    selected = providers
+    if only:
+        wanted = {n.strip().lower() for n in only if n.strip()}
+        selected = [
+            p
+            for p in selected
+            if p.info.name.lower() in wanted or p.info.category.lower() in wanted
+        ]
+    if exclude:
+        unwanted = {n.strip().lower() for n in exclude if n.strip()}
+        selected = [
+            p
+            for p in selected
+            if p.info.name.lower() not in unwanted
+            and p.info.category.lower() not in unwanted
+        ]
+    return selected

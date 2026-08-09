@@ -1,0 +1,28 @@
+name: reddit
+title: Reddit
+category: social
+homepage: https://www.reddit.com
+description: 注册邮箱可用性
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://www.reddit.com/api/check_email.json"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+  data:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      json_path_equals:
+        path: "valid"
+        value: false
+  - not_registered_if:
+      json_path_equals:
+        path: "valid"
+        value: true
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

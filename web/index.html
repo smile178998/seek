@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>seek · 邮箱注册痕迹反查</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔎</text></svg>" />
+</head>
+<body>
+  <div class="glow glow-a"></div>
+  <div class="glow glow-b"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">seek</span>
+      <span class="brand-sub">邮箱注册痕迹反查</span>
+    </div>
+    <div class="topbar-meta">
+      <span id="meta-providers" class="pill">模块加载中…</span>
+      <span id="meta-quota" class="pill pill-muted"></span>
+      <a class="pill pill-link" href="/docs" target="_blank" rel="noreferrer">API 文档</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel search-panel">
+      <div class="mode-row" id="mode-row">
+        <button type="button" class="mode-chip on" data-mode="scan">可靠扫描</button>
+        <button type="button" class="mode-chip" data-mode="ai" id="mode-ai">AI 可靠汇总</button>
+        <span id="ai-status" class="mode-hint">配置 SEEK_AI_API_KEY 后可用 · 默认可靠模式</span>
+      </div>
+
+      <div class="search-row">
+        <div class="input-shell">
+          <svg viewBox="0 0 24 24" class="input-icon" aria-hidden="true">
+            <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+          <input id="email" type="email" placeholder="somebody@example.com" autocomplete="off"
+                 spellcheck="false" />
+        </div>
+        <button id="run" class="btn btn-primary">
+          <span class="btn-label">开始查询</span>
+        </button>
+        <button id="stop" class="btn btn-ghost" hidden>停止</button>
+      </div>
+
+      <div class="filters" id="filters-row">
+        <span class="filters-label">检测分类</span>
+        <div id="category-chips" class="chip-row"></div>
+      </div>
+
+      <label class="consent" id="consent-wrap">
+        <input type="checkbox" id="consent" />
+        <span>
+          我确认仅对<strong>本人邮箱</strong>或<strong>已获得书面授权</strong>的目标进行查询，
+          并对使用后果负全部法律责任。
+        </span>
+      </label>
+    </section>
+
+    <section id="progress-panel" class="panel progress-panel" hidden>
+      <div class="progress-head">
+        <span id="progress-text">准备中…</span>
+        <span id="progress-count" class="mono">0 / 0</span>
+      </div>
+      <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+    </section>
+
+    <section id="stats" class="stats" hidden></section>
+
+    <section id="ai-report-panel" class="panel ai-report" hidden>
+      <h3>AI 汇总报告</h3>
+      <div id="ai-stats" class="ai-stats" hidden></div>
+      <p id="ai-summary" class="ai-summary"></p>
+      <div class="ai-cols">
+        <div>
+          <h4>已确认注册</h4>
+          <ul id="ai-confirmed"></ul>
+        </div>
+        <div>
+          <h4>域名 / 邮箱情报</h4>
+          <ul id="ai-intel"></ul>
+        </div>
+        <div>
+          <h4>明确未注册</h4>
+          <ul id="ai-not-registered"></ul>
+        </div>
+        <div>
+          <h4>疑似线索</h4>
+          <ul id="ai-likely"></ul>
+        </div>
+      </div>
+      <div id="ai-next" class="ai-next"></div>
+      <div id="ai-log" class="ai-log" hidden></div>
+    </section>
+
+    <section id="results-panel" class="panel results-panel" hidden>
+      <div class="results-toolbar">
+        <div id="status-filters" class="chip-row"></div>
+        <div class="toolbar-right">
+          <input id="keyword" class="mini-input" type="search" placeholder="过滤站点…" />
+          <button id="export-json" class="btn btn-mini">导出 JSON</button>
+          <button id="export-csv" class="btn btn-mini">导出 CSV</button>
+        </div>
+      </div>
+      <div id="results" class="results"></div>
+      <div id="empty" class="empty" hidden>没有符合当前筛选条件的结果</div>
+    </section>
+
+    <section class="panel notice">
+      <h3>使用须知</h3>
+      <ul>
+        <li>本工具仅用于<strong>本人账号资产梳理</strong>与<strong>已授权的安全评估</strong>。未经授权针对他人查询可能违反《个人信息保护法》《网络安全法》及目标站点服务条款。</li>
+        <li>结果仅为探测推断：站点改版、风控拦截、CDN 缓存都可能造成误报或漏报，<strong>不可作为结论性证据</strong>。</li>
+        <li>默认「可靠模式」只跑高可用模块；已注册为空通常表示未命中，不等于故障。完整覆盖可在 <code>.env</code> 设置 <code>SEEK_SCAN_PROFILE=full</code> / <code>SEEK_AI_PROFILE=full</code>。</li>
+        <li>内置模块只使用站点<strong>官方公开提供</strong>的查询接口。如需扩展，请在 <code>seek/definitions/</code> 下自行添加规则，并自行确认合法性。</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

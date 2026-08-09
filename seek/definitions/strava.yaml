@@ -1,0 +1,37 @@
+name: strava
+title: Strava
+category: sport
+homepage: https://www.strava.com
+description: 注册页 athletes/email_unique 接口
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://www.strava.com/register/free?cta=sign-up&element=button&source=website_show"
+    save:
+      csrf:
+        from: "body_regex"
+        pattern: '<meta name="csrf-token" content="([^"]+)"'
+        group: "1"
+
+request:
+  method: GET
+  url: "https://www.strava.com/athletes/email_unique"
+  params:
+    email: "{email}"
+  headers:
+    X-CSRF-Token: "{csrf}"
+    X-Requested-With: "XMLHttpRequest"
+    Referer: "https://www.strava.com/register/free"
+
+rules:
+  - registered_if:
+      body_matches: "^false$"
+    detail: 邮箱已注册（email_unique=false）
+  - not_registered_if:
+      body_matches: "^true$"
+    detail: 邮箱可用
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

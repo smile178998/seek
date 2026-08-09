@@ -1,0 +1,25 @@
+name: pipedrive
+title: Pipedrive
+category: crm
+homepage: https://www.pipedrive.com
+description: 注册邮箱校验
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://www.pipedrive.com/api/v1/users/validate_email"
+  headers:
+    Content-Type: "application/json"
+  json:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      body_contains: ["already", "taken", "exists"]
+    detail: 邮箱已占用
+  - not_registered_if:
+      status_in: ["200", "400"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

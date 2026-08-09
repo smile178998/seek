@@ -1,0 +1,36 @@
+name: imgur
+title: Imgur
+category: social
+homepage: https://imgur.com
+description: 注册页邮箱可用性 ajax 接口
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://imgur.com/register?redirect=%2Fuser"
+
+request:
+  method: POST
+  url: "https://imgur.com/signin/ajax_email_available"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+    X-Requested-With: "XMLHttpRequest"
+    Origin: "https://imgur.com"
+  data:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      status_in: ["200"]
+      json_path_equals:
+        path: "data.available"
+        value: false
+    detail: 邮箱已被占用
+  - not_registered_if:
+      json_path_equals:
+        path: "data.available"
+        value: true
+  - rate_limited_if:
+      status_in: ["429", "403", "412"]
+
+default: unknown

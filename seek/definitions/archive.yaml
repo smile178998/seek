@@ -1,0 +1,26 @@
+name: archive
+title: Archive.org
+category: media
+homepage: https://archive.org
+description: 账号服务邮箱检查
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://archive.org/account/signup"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+  data:
+    input_mail: "{email}"
+    input_password: "{random_password}"
+
+rules:
+  - registered_if:
+      body_contains: ["already", "in use", "exists"]
+    detail: 邮箱已占用
+  - not_registered_if:
+      status_in: ["200", "400"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

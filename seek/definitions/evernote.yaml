@@ -1,0 +1,30 @@
+name: evernote
+title: Evernote
+category: dev
+homepage: https://evernote.com
+description: 登录页用户名探测
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://www.evernote.com/Login.action"
+
+request:
+  method: POST
+  url: "https://www.evernote.com/Login.action"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+  data:
+    username: "{email}"
+    evaluateUsername: ""
+
+rules:
+  - registered_if:
+      body_contains: ["usePasswordAuth"]
+    detail: 账号存在
+  - not_registered_if:
+      body_contains: ["displayMessage", "not found"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

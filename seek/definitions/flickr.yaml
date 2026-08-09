@@ -1,0 +1,27 @@
+name: flickr
+title: Flickr
+category: media
+homepage: https://flickr.com
+description: 登录迁移接口按邮箱查询账号状态
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: GET
+  url: "https://identity-api.flickr.com/migration"
+  params:
+    email: "{email}"
+  headers:
+    Origin: "https://identity.flickr.com"
+
+rules:
+  - registered_if:
+      json_path_equals:
+        path: "state_code"
+        value: 5
+    detail: 账号存在
+  - not_registered_if:
+      status_in: ["200", "404"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

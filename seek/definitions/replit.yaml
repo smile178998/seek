@@ -1,0 +1,28 @@
+name: replit
+title: Replit
+category: dev
+homepage: https://replit.com
+description: 用户存在性接口 /data/user/exists
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://replit.com/data/user/exists"
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"
+  json:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      json_path_truthy: "exists"
+    detail: 用户已存在
+  - not_registered_if:
+      json_path_equals:
+        path: "exists"
+        value: false
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

@@ -1,0 +1,56 @@
+# ============================================================
+# 方法一：注册查重法
+# 拿邮箱去注册接口，看是否提示「邮箱已被使用」
+# 复制本文件改名、把 enabled 改 true 即可用
+# ============================================================
+name: example_register
+title: 示例·注册查重法
+category: social
+homepage: https://example.com
+description: 通过注册接口的「邮箱已被使用」提示判断是否已注册
+notes: 这是最可靠的一类方法——注册必须拒绝重复邮箱，所以提示通常真实
+enabled: false
+
+# 多数站点注册要带 CSRF token，先 GET 注册页拿到它（不需要就删掉整段 prepare）
+prepare:
+  - method: GET
+    url: "https://example.com/signup"
+    save:
+      csrf:
+        from: cookie          # cookie / header / json / body_regex
+        name: csrftoken
+        required: false
+        default: ""
+
+request:
+  method: POST
+  url: "https://example.com/api/signup"
+  headers:
+    X-CSRFToken: "{csrf}"
+    Content-Type: "application/json"
+    Accept: "application/json"
+  json:
+    email: "{email}"
+    password: "{random_password}"   # 用随机密码，避免真的把账号建出来
+  follow_redirects: false
+
+rules:
+  # 命中「已被使用 / 已注册 / already / taken / in use」等字样 → 已注册
+  - registered_if:
+      body_matches: "(already[ _-]?(taken|registered|in use)|email[^\"]{0,20}(taken|exists)|已被(使用|注册|占用)|已(注册|存在))"
+    detail: 注册接口提示邮箱已被使用 → 已注册
+
+  # 返回成功且没有上述提示 → 可正常注册 = 未注册
+  - not_registered_if:
+      status_in: [200, 201, 400, 422]
+      body_not_contains: ["already", "taken", "已注册", "已被"]
+    detail: 邮箱可用于注册 → 未注册
+
+  - rate_limited_if:
+      status_in: [429]
+  - error_if:
+      status_in: [401, 403]
+    detail: 被风控拦截，换出口 IP / 挂代理后重试
+
+default: unknown
+default_detail: 响应与规则不匹配，可能接口已改版

@@ -1,0 +1,33 @@
+name: yahoo
+title: Yahoo Mail
+category: mail
+homepage: https://mail.yahoo.com
+description: 登录页用户名探测（登录流程第一步）
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://login.yahoo.com"
+
+request:
+  method: POST
+  url: "https://login.yahoo.com/"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+    X-Requested-With: "XMLHttpRequest"
+  data:
+    username: "{email}"
+    passwd: ""
+    signin: "Next"
+    persistent: "y"
+
+rules:
+  - registered_if:
+      body_matches: '"error":\s*false'
+    detail: 账号存在（进入密码/验证步骤）
+  - not_registered_if:
+      body_contains: ["ERROR_INVALID_USERNAME", "not found"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

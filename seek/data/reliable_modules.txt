@@ -1,0 +1,12 @@
+# 可靠模式白名单：仅保留在本环境可给出明确判定的模块
+# （大量站点在国内网络/风控下会 403/超时/改版，放入 full 档）
+
+# 域名与邮箱情报（最稳）
+mx
+mail_provider
+disposable
+
+# 实测可明确判定的站点
+duolingo
+protonmail
+adobe

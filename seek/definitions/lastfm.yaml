@@ -1,0 +1,37 @@
+name: lastfm
+title: Last.fm
+category: music
+homepage: https://www.last.fm
+description: 注册页 partial/validate 邮箱校验
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://www.last.fm/join"
+    save:
+      csrf:
+        from: "cookie"
+        name: "csrftoken"
+
+request:
+  method: POST
+  url: "https://www.last.fm/join/partial/validate"
+  headers:
+    X-Requested-With: "XMLHttpRequest"
+    Referer: "https://www.last.fm/join"
+    Cookie: "csrftoken={csrf}"
+  data:
+    csrfmiddlewaretoken: "{csrf}"
+    userName: ""
+    email: "{email}"
+
+rules:
+  - registered_if:
+      body_contains: ["already registered to another account"]
+    detail: 邮箱已注册
+  - not_registered_if:
+      status_in: ["200"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

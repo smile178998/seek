@@ -1,0 +1,17 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+httpx[http2]==0.28.1
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+PyYAML==6.0.2
+typer==0.15.1
+rich==13.9.4
+dnspython==2.7.0
+email-validator==2.2.0
+truststore==0.10.1
+
+# 可选：启用约 120 个站点的注册探测模块（AI 探查会自动调用）
+holehe==1.61
+# 可选：再多一层社交平台邮箱占用检测（AI 探查会自动调用）
+# socialscan

@@ -1,0 +1,34 @@
+name: github
+title: GitHub
+category: dev
+homepage: https://github.com
+description: 注册页邮箱校验接口 signup_check/email
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://github.com/join"
+    save:
+      auth_token:
+        from: "body_regex"
+        pattern: 'signup_check/email[\s\S]*?value="([^"]+)"'
+        group: "1"
+
+request:
+  method: POST
+  url: "https://github.com/signup_check/email"
+  data:
+    value: "{email}"
+    authenticity_token: "{auth_token}"
+
+rules:
+  - registered_if:
+      status_eq: 422
+    detail: 邮箱已被占用
+  - not_registered_if:
+      status_eq: 200
+    detail: 邮箱可用
+  - rate_limited_if:
+      body_contains: ["Your browser did something unexpected"]
+
+default: unknown

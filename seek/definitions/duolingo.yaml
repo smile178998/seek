@@ -1,0 +1,33 @@
+name: duolingo
+title: Duolingo
+category: edu
+homepage: https://www.duolingo.com
+description: 通过 Duolingo 公开用户查询接口判断邮箱是否已注册
+notes: 该接口是 Duolingo 官方公开的用户查询 API，长期稳定，误报率低
+
+request:
+  method: GET
+  url: "https://www.duolingo.com/2017-06-30/users"
+  params:
+    email: "{email}"
+  headers:
+    Accept: "application/json"
+  follow_redirects: true
+
+rules:
+  - registered_if:
+      status_in: [200]
+      json_path_truthy: "users.0"
+    detail: 该邮箱已注册 Duolingo
+  - not_registered_if:
+      status_in: [200]
+    detail: 未在 Duolingo 注册
+  - rate_limited_if:
+      status_in: [429]
+
+extract:
+  username: "users.0.username"
+  user_id: "users.0.id"
+
+default: unknown
+default_detail: 接口返回格式与规则不匹配，可能已改版

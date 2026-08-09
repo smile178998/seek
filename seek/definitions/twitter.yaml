@@ -1,0 +1,28 @@
+name: twitter
+title: Twitter / X
+category: social
+homepage: https://twitter.com
+description: 注册邮箱可用性接口（email_available）
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: GET
+  url: "https://api.twitter.com/i/users/email_available.json"
+  params:
+    email: "{email}"
+  headers:
+    Accept: "application/json"
+
+rules:
+  - registered_if:
+      json_path_truthy: "taken"
+    detail: 邮箱已被占用
+  - not_registered_if:
+      status_in: ["200"]
+      json_path_equals:
+        path: "taken"
+        value: false
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

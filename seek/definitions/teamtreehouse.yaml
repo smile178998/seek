@@ -1,0 +1,30 @@
+name: teamtreehouse
+title: Team Treehouse
+category: edu
+homepage: https://teamtreehouse.com
+description: 注册邮箱校验
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://teamtreehouse.com/subscribe/new"
+
+request:
+  method: POST
+  url: "https://teamtreehouse.com/subscribe/new.json"
+  headers:
+    Content-Type: "application/json"
+    X-Requested-With: "XMLHttpRequest"
+  json:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      body_contains: ["already", "taken"]
+    detail: 邮箱已占用
+  - not_registered_if:
+      status_in: ["200", "400"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

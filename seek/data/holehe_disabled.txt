@@ -1,0 +1,61 @@
+# ============================================================
+# 被禁用的 Holehe 模块清单（一行一个模块名，# 开头为注释）
+# 这些是实测长期失效的模块，默认不加载，让结果列表更干净。
+# 想重新启用某个站点：删掉对应那一行即可。
+# 想按你自己的网络环境重新生成这份清单：
+#     python -m seek.cli prune-holehe 你的邮箱@example.com
+# ============================================================
+
+# ---------- 接口已改版 / 解析逻辑失效（换任何网络都修不好，除非重写模块）----------
+aboutme
+amocrm
+atlassian
+biosmods
+biotechnologyforums
+bitmoji
+blitzortung
+buymeacoffee
+clashfarmer
+codecademy
+crevado
+discord
+ebay
+ello
+firefox
+freiberg
+garmin
+google
+imgur
+instagram
+yahoo
+evernote
+github
+pinterest
+rocketreach
+samsung
+snapchat
+soundcloud
+deliveroo
+
+# ---------- 站点反爬拦截（403 / 503，挂境外代理后个别可能恢复，可自行删行重试）----------
+babeshows
+blablacar
+bluegrassrivals
+cambridgemt
+codeigniter
+codepen
+cpaelites
+issuu
+koditv
+nimble
+
+# ---------- 冷门站点已死 / 域名不解析（基本不会恢复）----------
+badeggsonline
+blackworldforum
+chinaphonearena
+cpahero
+cracked_to
+demonforums
+nattyornot
+nike
+tumblr

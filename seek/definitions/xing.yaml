@@ -1,0 +1,29 @@
+name: xing
+title: Xing
+category: social
+homepage: https://www.xing.com
+description: 注册校验 API signup/validate
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://www.xing.com/start/signup?registration=1"
+
+request:
+  method: POST
+  url: "https://www.xing.com/welcome/api/signup/validate"
+  headers:
+    Content-Type: "application/json"
+  json:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      body_contains: ["already", "taken", "exists"]
+    detail: 邮箱已占用
+  - not_registered_if:
+      status_in: ["200", "400"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

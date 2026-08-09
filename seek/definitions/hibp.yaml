@@ -1,0 +1,37 @@
+name: hibp
+title: Have I Been Pwned
+category: breach
+homepage: https://haveibeenpwned.com
+description: 查询该邮箱出现在哪些已知数据泄露事件中（官方付费 API）
+requires:
+  - HIBP_API_KEY
+
+request:
+  method: GET
+  url: "https://haveibeenpwned.com/api/v3/breachedaccount/{email_urlenc}"
+  params:
+    truncateResponse: "false"
+  headers:
+    hibp-api-key: "{env.HIBP_API_KEY}"
+    Accept: "application/json"
+    User-Agent: "seek-email-recon"
+  follow_redirects: false
+
+rules:
+  - info_if:
+      status_in: [200]
+    detail: 该邮箱出现在已知的数据泄露事件中
+  - not_registered_if:
+      status_in: [404]
+    detail: 未出现在 HIBP 收录的泄露数据中
+  - rate_limited_if:
+      status_in: [429]
+  - error_if:
+      status_in: [401]
+    detail: API Key 无效或已过期
+
+extract:
+  breaches: "[].Name"
+  breach_dates: "[].BreachDate"
+
+default: unknown

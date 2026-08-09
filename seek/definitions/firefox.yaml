@@ -1,0 +1,24 @@
+name: firefox
+title: Firefox Account
+category: dev
+homepage: https://accounts.firefox.com
+description: Mozilla 账号状态公开接口
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://api.accounts.firefox.com/v1/account/status"
+  data:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      body_matches: "^true$"
+    detail: 账号存在
+  - not_registered_if:
+      body_matches: "^false$"
+    detail: 账号不存在
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

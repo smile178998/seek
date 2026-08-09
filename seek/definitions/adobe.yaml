@@ -1,0 +1,33 @@
+name: adobe
+title: Adobe
+category: dev
+homepage: https://www.adobe.com
+description: Adobe IMS 登录态探测（公开 authenticationstate 接口）
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://auth.services.adobe.com/signin/v1/authenticationstate"
+  headers:
+    Content-Type: "application/json"
+    X-IMS-CLIENTID: "adobedotcom2"
+    Origin: "https://auth.services.adobe.com"
+    Accept: "application/json"
+  json:
+    username: "{email}"
+    accountType: "individual"
+
+rules:
+  - registered_if:
+      status_in: [200]
+      json_path_exists: "id"
+    detail: 账号存在（进入验证流程）
+  - not_registered_if:
+      status_in: [401]
+      body_contains: ["Could not find account"]
+    detail: Adobe 未找到该账号
+  - rate_limited_if:
+      status_in: [429, 403]
+
+default: unknown
+default_detail: 接口返回格式与规则不匹配，可能已改版

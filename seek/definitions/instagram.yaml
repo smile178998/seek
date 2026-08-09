@@ -1,0 +1,56 @@
+name: instagram
+title: Instagram
+category: social
+homepage: https://www.instagram.com
+description: 通过注册流程的邮箱查重接口判断是否已注册（需先取 CSRF token）
+notes: >
+  演示「两步请求」：先 GET 注册页拿 csrftoken cookie，再带着它 POST 查重。
+  Instagram 风控很强，频繁请求会被限流或返回无法判定。仅限本人 / 已授权使用。
+
+# 第一步：拿 CSRF token
+prepare:
+  - method: GET
+    url: "https://www.instagram.com/accounts/emailsignup/"
+    headers:
+      Accept: "text/html"
+    save:
+      csrf:
+        from: cookie
+        name: csrftoken
+        required: false
+        default: "missing"
+
+# 第二步：带 token 查重
+request:
+  method: POST
+  url: "https://www.instagram.com/api/v1/web/accounts/web_create_ajax/attempt/"
+  headers:
+    X-CSRFToken: "{csrf}"
+    X-Requested-With: "XMLHttpRequest"
+    X-IG-App-ID: "936619743392459"
+    Referer: "https://www.instagram.com/accounts/emailsignup/"
+    Content-Type: "application/x-www-form-urlencoded"
+  data:
+    email: "{email}"
+    first_name: ""
+    username: ""
+    opt_into_one_tap: "false"
+  follow_redirects: false
+
+rules:
+  - registered_if:
+      json_path_exists: "errors.email"
+    detail: 该邮箱已被 Instagram 账号占用
+  - registered_if:
+      body_contains: ["email_is_taken"]
+    detail: 该邮箱已被占用
+  - not_registered_if:
+      status_in: [200]
+      body_not_contains: ["errors", "email_is_taken"]
+    detail: 该邮箱可用于注册（未注册）
+  - rate_limited_if:
+      status_in: [429]
+    detail: 被 Instagram 限流
+
+default: unknown
+default_detail: 未取到 CSRF token 或响应格式已变化

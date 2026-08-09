@@ -1,0 +1,28 @@
+name: trello
+title: Trello
+category: dev
+homepage: https://trello.com
+description: Atlassian 账号邮箱校验（Trello 注册页）
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: GET
+  url: "https://trello.com/1/account/exists"
+  params:
+    email: "{email}"
+  headers:
+    Accept: "application/json"
+
+rules:
+  - registered_if:
+      json_path_equals:
+        path: "exists"
+        value: true
+  - not_registered_if:
+      json_path_equals:
+        path: "exists"
+        value: false
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

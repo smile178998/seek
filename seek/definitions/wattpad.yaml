@@ -1,0 +1,30 @@
+name: wattpad
+title: Wattpad
+category: social
+homepage: https://www.wattpad.com
+description: 用户校验 API v3/users/validate
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://www.wattpad.com"
+
+request:
+  method: GET
+  url: "https://www.wattpad.com/api/v3/users/validate"
+  params:
+    email: "{email}"
+  headers:
+    X-Requested-With: "XMLHttpRequest"
+
+rules:
+  - registered_if:
+      body_contains: ["already", "Cette adresse", "already in use"]
+    detail: 邮箱已被占用
+  - not_registered_if:
+      status_in: ["200", "400"]
+      body_matches: '"message":"OK"'
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

@@ -1,0 +1,35 @@
+name: codecademy
+title: Codecademy
+category: edu
+homepage: https://www.codecademy.com
+description: 注册校验接口 /register/validate
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://www.codecademy.com/register?redirect=%2F"
+    save:
+      csrf:
+        from: "body_regex"
+        pattern: 'name="csrf-token" content="([^"]+)"'
+        group: "1"
+
+request:
+  method: POST
+  url: "https://www.codecademy.com/register/validate"
+  headers:
+    Content-Type: "application/json"
+    X-CSRF-Token: "{csrf}"
+    Origin: "https://www.codecademy.com"
+  data: '{"user":{"email":"{email}"}}'
+
+rules:
+  - registered_if:
+      body_contains: ["is already taken"]
+    detail: 邮箱已被占用
+  - not_registered_if:
+      status_in: ["200", "422"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

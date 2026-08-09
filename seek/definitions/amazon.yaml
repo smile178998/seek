@@ -1,0 +1,29 @@
+name: amazon
+title: Amazon
+category: shop
+homepage: https://www.amazon.com
+description: 登录页邮箱探测（auth-password-missing-alert）
+notes: 需跟随登录页表单字段，改版频繁
+
+prepare:
+  - method: GET
+    url: "https://www.amazon.com/ap/signin?openid.mode=checkid_setup"
+
+request:
+  method: POST
+  url: "https://www.amazon.com/ap/signin/"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+  data:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      body_contains: ["auth-password-missing-alert", "password"]
+    detail: 账号存在（要求输入密码）
+  - not_registered_if:
+      body_contains: ["cannot find an account", "not found"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

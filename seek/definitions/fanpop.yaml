@@ -1,0 +1,26 @@
+name: fanpop
+title: Fanpop
+category: social
+homepage: https://www.fanpop.com
+description: 登录 superlogin 探测账号
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://www.fanpop.com/login/superlogin"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+  data:
+    email: "{email}"
+    password: "{random_password}"
+
+rules:
+  - registered_if:
+      body_contains: ["password", "incorrect", "wrong"]
+    detail: 账号存在（密码错误）
+  - not_registered_if:
+      body_contains: ["not found", "no account", "invalid"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

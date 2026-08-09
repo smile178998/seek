@@ -1,0 +1,31 @@
+name: docker
+title: Docker Hub
+category: dev
+homepage: https://hub.docker.com
+description: 注册接口返回邮箱占用提示
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://hub.docker.com/v2/users/signup/"
+  headers:
+    Content-Type: "application/json"
+    Origin: "https://hub.docker.com"
+  json:
+    email: "{email}"
+    password: ""
+    recaptcha_response: ""
+    redirect_value: ""
+    subscribe: true
+    username: ""
+
+rules:
+  - registered_if:
+      body_contains: ["This email is already in use"]
+    detail: 邮箱已注册
+  - not_registered_if:
+      status_in: ["200", "400"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

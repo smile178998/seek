@@ -1,0 +1,31 @@
+name: myspace
+title: Myspace
+category: social
+homepage: https://myspace.com
+description: 注册邮箱 validateemail
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://myspace.com/signup/email"
+
+request:
+  method: POST
+  url: "https://myspace.com/ajax/account/validateemail"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+    X-Requested-With: "XMLHttpRequest"
+    Origin: "https://myspace.com"
+  data:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      body_contains: ["already used to create an account"]
+    detail: 邮箱已注册
+  - not_registered_if:
+      status_in: ["200"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

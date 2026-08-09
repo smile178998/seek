@@ -1,0 +1,27 @@
+name: tellonym
+title: Tellonym
+category: social
+homepage: https://tellonym.me
+description: 账号检查接口 accounts/check
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: GET
+  url: "https://api.tellonym.me/accounts/check"
+  params:
+    email: "{email}"
+  headers:
+    Accept: "application/json"
+
+rules:
+  - registered_if:
+      json_path_truthy: "exists"
+    detail: 账号存在
+  - not_registered_if:
+      json_path_equals:
+        path: "exists"
+        value: false
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

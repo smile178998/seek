@@ -1,0 +1,26 @@
+name: plurk
+title: Plurk
+category: social
+homepage: https://www.plurk.com
+description: 邮箱是否已注册 isEmailFound
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://www.plurk.com/Users/isEmailFound"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+    X-Requested-With: "XMLHttpRequest"
+  data:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      body_contains: ["true", "found"]
+    detail: 邮箱已找到
+  - not_registered_if:
+      body_contains: ["false", "not found"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

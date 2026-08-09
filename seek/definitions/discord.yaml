@@ -1,0 +1,33 @@
+name: discord
+title: Discord
+category: social
+homepage: https://discord.com
+description: 模拟注册请求，根据 EMAIL_ALREADY_REGISTERED 判断
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://discord.com/api/v9/auth/register"
+  headers:
+    Content-Type: "application/json"
+    Origin: "https://discord.com"
+  json:
+    fingerprint: ""
+    email: "{email}"
+    username: "{local}{nonce}"
+    password: "{random_password}"
+    invite: null
+    consent: true
+    date_of_birth: ""
+
+rules:
+  - registered_if:
+      body_contains: ["EMAIL_ALREADY_REGISTERED"]
+    detail: 邮箱已注册
+  - not_registered_if:
+      body_contains: ["captcha-required"]
+    detail: 需验证码（视为未触发已注册）
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

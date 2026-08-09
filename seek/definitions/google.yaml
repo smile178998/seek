@@ -1,0 +1,35 @@
+name: google
+title: Google
+category: mail
+homepage: https://accounts.google.com
+description: 注册用户名可用性（gf.wuar 标记）
+notes: Google 风控极强，常返回无法判定；接口随改版变化快
+
+prepare:
+  - method: GET
+    url: "https://accounts.google.com/signup/v2/webcreateaccount?flowName=GlifWebSignIn&flowEntry=SignUp"
+
+request:
+  method: POST
+  url: "https://accounts.google.com/_/signup/webusernameavailability"
+  params:
+    hl: "en"
+    rt: "j"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+    Origin: "https://accounts.google.com"
+  data:
+    continue: "https://accounts.google.com/"
+    f.req: '["","","","{email}",false]'
+
+rules:
+  - registered_if:
+      body_matches: '"gf.wuar",2'
+    detail: 邮箱已占用
+  - not_registered_if:
+      body_matches: '"gf.wuar",1'
+      body_contains: ["EmailInvalid"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

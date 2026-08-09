@@ -1,0 +1,37 @@
+name: pinterest
+title: Pinterest
+category: social
+homepage: https://www.pinterest.com
+description: 调用 Pinterest 的 EmailExists 资源接口判断邮箱是否已注册
+notes: >
+  Pinterest 登录 / 注册页用该接口判断「这个邮箱是否已有账号」。
+  参数为 URL 编码的 JSON，接口可能随前端改版而变化。仅限本人 / 已授权使用。
+
+request:
+  method: GET
+  url: "https://www.pinterest.com/resource/EmailExistsResource/get/"
+  params:
+    source_url: "/"
+    data: '{"options":{"email":"{email}"},"context":{}}'
+  headers:
+    Accept: "application/json, text/javascript, */*, q=0.01"
+    X-Requested-With: "XMLHttpRequest"
+    X-APP-VERSION: "eecb98d"
+    Referer: "https://www.pinterest.com/"
+
+rules:
+  - registered_if:
+      json_path_equals:
+        path: "resource_response.data"
+        value: true
+    detail: 该邮箱已注册 Pinterest
+  - not_registered_if:
+      json_path_equals:
+        path: "resource_response.data"
+        value: false
+    detail: 未在 Pinterest 注册
+  - rate_limited_if:
+      status_in: [429]
+
+default: unknown
+default_detail: 接口返回格式与规则不匹配，可能已改版

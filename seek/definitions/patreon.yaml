@@ -1,0 +1,32 @@
+name: patreon
+title: Patreon
+category: social
+homepage: https://www.patreon.com
+description: 注册邮箱可用性 JSON API
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://www.patreon.com/api/email/available"
+  params:
+    json-api-version: "1.0"
+    include: "[]"
+  headers:
+    Content-Type: "application/vnd.api+json"
+    Origin: "https://www.patreon.com"
+  data: '{"data":{"attributes":{"email":"{email}"},"relationships":{}}}'
+
+rules:
+  - registered_if:
+      json_path_equals:
+        path: "data.is_available"
+        value: false
+    detail: 邮箱已注册
+  - not_registered_if:
+      json_path_equals:
+        path: "data.is_available"
+        value: true
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

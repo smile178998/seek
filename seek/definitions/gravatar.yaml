@@ -1,0 +1,26 @@
+name: gravatar
+title: Gravatar 头像
+category: profile
+homepage: https://gravatar.com
+description: Gravatar 官方公开头像接口，按邮箱哈希查询是否存在头像
+
+request:
+  method: GET
+  url: "https://www.gravatar.com/avatar/{email_sha256}"
+  params:
+    d: "404"
+  headers:
+    Accept: "image/*"
+  follow_redirects: true
+
+rules:
+  - registered_if:
+      status_in: [200]
+    detail: 该邮箱注册过 Gravatar 并设置了头像
+  - not_registered_if:
+      status_in: [404]
+    detail: 未找到对应的 Gravatar 头像
+  - rate_limited_if:
+      status_in: [429]
+
+default: unknown

@@ -1,0 +1,26 @@
+name: envato
+title: Envato
+category: shop
+homepage: https://envato.com
+description: 注册邮箱校验
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://account.envato.com/api/public/sign_up"
+  headers:
+    Content-Type: "application/json"
+  json:
+    email: "{email}"
+    password: "{random_password}"
+
+rules:
+  - registered_if:
+      body_contains: ["already", "taken", "exists"]
+    detail: 邮箱已占用
+  - not_registered_if:
+      status_in: ["200", "400", "422"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

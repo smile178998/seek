@@ -1,0 +1,61 @@
+# ============================================================
+# 方法二：忘记密码 / 重置密码法
+# 向「忘记密码」接口提交邮箱，看提示「已发送重置邮件」还是「未找到账号」
+# 复制本文件改名、把 enabled 改 true 即可用
+#
+# ⚠ 重要：越来越多站点为「防止账号枚举」，故意对
+#   已注册 / 未注册 返回【完全相同】的提示（如统一显示
+#   “如果该邮箱已注册，我们已发送邮件”）。遇到这种站点，
+#   本方法无法判定，会返回 unknown —— 这不是 bug，是站点的安全设计。
+# ============================================================
+name: example_forgot
+title: 示例·忘记密码法
+category: social
+homepage: https://example.com
+description: 通过找回密码接口的不同提示判断邮箱是否已注册
+notes: 对做了防枚举的站点无效；能否使用受目标站点服务条款约束
+enabled: false
+
+# 需要 CSRF 就保留 prepare，不需要就删掉
+prepare:
+  - method: GET
+    url: "https://example.com/password/reset"
+    save:
+      csrf:
+        from: cookie
+        name: csrftoken
+        required: false
+        default: ""
+
+request:
+  method: POST
+  url: "https://example.com/api/password/reset"
+  headers:
+    X-CSRFToken: "{csrf}"
+    Content-Type: "application/json"
+    Accept: "application/json"
+  json:
+    email: "{email}"
+
+rules:
+  # 提示「已发送重置邮件」→ 账号存在
+  - registered_if:
+      body_matches: "(reset (email|link|instructions) (has been )?sent|we('| ha)ve sent|check your (inbox|email)|重置邮件?已发送|已向.{0,10}发送)"
+    detail: 提示已发送重置邮件 → 账号存在
+
+  # 提示「未找到 / 未注册」→ 账号不存在
+  - not_registered_if:
+      body_matches: "(no account|not[ _-]?found|isn'?t registered|no user|未(找到|注册)|不存在|没有.{0,6}账号)"
+    detail: 提示未找到账号 → 不存在
+
+  # 有些站点用状态码区分：404=不存在，200=存在
+  - registered_if:
+      status_eq: 200
+  - not_registered_if:
+      status_in: [404]
+
+  - rate_limited_if:
+      status_in: [429]
+
+default: unknown
+default_detail: 存在/不存在返回相同提示（站点已做防枚举），无法判定

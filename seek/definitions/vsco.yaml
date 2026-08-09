@@ -1,0 +1,26 @@
+name: vsco
+title: VSCO
+category: social
+homepage: https://vsco.co
+description: 用户邮箱查询 API
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: GET
+  url: "https://api.vsco.co/2.0/users/email"
+  params:
+    email: "{email}"
+  headers:
+    Accept: "application/json"
+
+rules:
+  - registered_if:
+      status_in: ["200"]
+      json_path_exists: "user"
+    detail: 用户存在
+  - not_registered_if:
+      status_in: ["404"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

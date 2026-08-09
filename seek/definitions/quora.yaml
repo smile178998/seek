@@ -1,0 +1,30 @@
+name: quora
+title: Quora
+category: edu
+homepage: https://www.quora.com
+description: 注册邮箱 validate server_call
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+prepare:
+  - method: GET
+    url: "https://www.quora.com"
+
+request:
+  method: POST
+  url: "https://www.quora.com/webnode2/server_call_POST"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+  data:
+    json: '{"args":[],"kwargs":{"value":"{email}"}}'
+    __method: "validate"
+
+rules:
+  - registered_if:
+      body_contains: ["already", "account", "taken", "compte"]
+    detail: 邮箱已占用
+  - not_registered_if:
+      status_in: ["200"]
+  - rate_limited_if:
+      status_in: ["429", "403"]
+
+default: unknown

@@ -1,5 +1,7 @@
 # seek · 邮箱注册痕迹反查
 
+**中文** | [English](README_EN.md)
+
 类似 [Holehe](https://github.com/megadose/holehe) 的邮箱 OSINT 工具，重点是**可扩展 YAML 规则引擎**：不用改代码就能加站点，并提供 Web 界面、CLI 和 HTTP API。
 
 ```text

@@ -33,15 +33,26 @@ def load_definition_files(directory: Path) -> list[tuple[Path, dict[str, Any]]]:
     return specs
 
 
-def load_providers(settings: Settings | None = None) -> list[Provider]:
+def load_providers(
+    settings: Settings | None = None,
+    profile: str | None = None,
+    include_holehe: bool | None = None,
+) -> list[Provider]:
     """加载检测模块：内置 Python 模块 + definitions 目录下的 YAML 规则。
 
-    默认 scan_profile=reliable 时只保留白名单模块，减少大量 unknown/失败噪声。
+    - profile=reliable（默认）：只保留白名单高可用模块，减少 unknown/失败噪声。
+    - profile=full：加载全部 YAML 规则，并按需接入 Holehe 的上百个站点模块（覆盖最大，噪声更大）。
+
+    include_holehe 为 None 时按 profile 推断：full 档默认接入 Holehe，reliable 档不接入。
     """
     settings = settings or get_settings()
+    profile = settings.normalize_profile(profile, kind="scan")
+    if include_holehe is None:
+        include_holehe = profile == "full"
+
     providers: list[Provider] = [factory() for factory in BUILTIN_FACTORIES]
 
-    if settings.enable_holehe and settings.normalize_profile(None, kind="scan") == "full":
+    if include_holehe and profile == "full":
         disabled = settings.disabled_holehe()
         for provider in load_holehe_providers():
             short = provider.info.name
@@ -63,7 +74,6 @@ def load_providers(settings: Settings | None = None) -> list[Provider]:
             continue
         providers.append(DeclarativeProvider(info, spec))
 
-    profile = settings.normalize_profile(None, kind="scan")
     if profile == "reliable":
         allow = settings.reliable_modules()
         if allow:

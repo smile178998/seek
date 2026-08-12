@@ -83,6 +83,22 @@ def _split_csv(value: str | None) -> list[str]:
     return [part.strip() for part in (value or "").split(",") if part.strip()]
 
 
+def providers_for(request: Request, profile: str | None) -> list:
+    """按档位取模块列表：reliable 用启动时加载的白名单集合；full 懒加载全量+Holehe 并缓存。"""
+    settings: Settings = request.app.state.settings
+    resolved = settings.normalize_profile(profile, kind="scan")
+    if resolved != "full":
+        return request.app.state.providers
+
+    cached = getattr(request.app.state, "providers_full", None)
+    if cached is None:
+        log.info("首次全网完整搜索：加载全量规则 + Holehe 模块…")
+        cached = load_providers(settings, profile="full", include_holehe=True)
+        request.app.state.providers_full = cached
+        log.info("完整模式已加载 %d 个模块", len(cached))
+    return cached
+
+
 @app.get("/api/meta")
 async def meta(request: Request) -> dict:
     settings: Settings = request.app.state.settings
@@ -118,7 +134,8 @@ async def providers(request: Request) -> list[ProviderInfo]:
 async def scan(request: Request, payload: ScanRequest) -> ScanResponse:
     email = guard(request, payload.email, payload.consent)
     settings: Settings = request.app.state.settings
-    async with Engine(request.app.state.providers, settings) as engine:
+    providers = providers_for(request, payload.profile)
+    async with Engine(providers, settings) as engine:
         return await engine.scan(email, payload.only, payload.exclude)
 
 
@@ -129,9 +146,11 @@ async def scan_stream(
     consent: bool = Query(False, description="是否已确认授权声明"),
     only: str | None = Query(None, description="仅运行这些模块/分类，逗号分隔"),
     exclude: str | None = Query(None, description="排除这些模块/分类，逗号分隔"),
+    profile: str | None = Query(None, description="档位：reliable（默认）或 full（全网完整搜索）"),
 ) -> StreamingResponse:
     settings: Settings = request.app.state.settings
     only_list, exclude_list = _split_csv(only), _split_csv(exclude)
+    providers = providers_for(request, profile)
 
     # EventSource 读不到 HTTP 错误响应体，所以校验失败也走事件下发
     try:
@@ -143,7 +162,7 @@ async def scan_stream(
         started = time.perf_counter()
         results = []
         try:
-            async with Engine(request.app.state.providers, settings) as engine:
+            async with Engine(providers, settings) as engine:
                 total = len(filter_providers(engine.providers, only_list, exclude_list))
                 yield _sse("start", {"email": normalized, "total": total})
                 async for result in engine.stream(normalized, only_list, exclude_list):

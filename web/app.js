@@ -184,6 +184,8 @@ function setMode(mode) {
     c.classList.toggle("on", c.dataset.mode === mode);
   });
   el("filters-row").hidden = mode === "ai";
+  const fullWrap = el("full-toggle-wrap");
+  if (fullWrap) fullWrap.hidden = mode === "ai";
   el("run").querySelector(".btn-label").textContent =
     mode === "ai" ? "开始 AI 汇总" : "开始查询";
 }
@@ -265,7 +267,8 @@ function start() {
     toast("请先勾选授权声明", true);
     return;
   }
-  if (state.mode === "scan" && state.activeCategories.size === 0) {
+  const fullScan = !!(el("full-scan") && el("full-scan").checked);
+  if (state.mode === "scan" && !fullScan && state.activeCategories.size === 0) {
     toast("请至少选择一个检测分类", true);
     return;
   }
@@ -294,7 +297,8 @@ function start() {
   const params = new URLSearchParams({
     email,
     consent: "true",
-    only: [...state.activeCategories].join(","),
+    only: fullScan ? "" : [...state.activeCategories].join(","),
+    profile: fullScan ? "full" : "reliable",
   });
   const source = new EventSource(`/api/scan/stream?${params.toString()}`);
   state.source = source;

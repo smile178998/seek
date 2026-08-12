@@ -89,6 +89,7 @@ class ScanRequest(BaseModel):
     consent: bool = False
     only: list[str] = Field(default_factory=list)
     exclude: list[str] = Field(default_factory=list)
+    profile: Literal["reliable", "full"] | None = None
 
 
 class ScanResponse(BaseModel):

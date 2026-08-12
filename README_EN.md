@@ -31,8 +31,8 @@ Results are heuristic signals only (site changes, anti-bot controls, and network
 
 | Mode | Description |
 | --- | --- |
-| **Reliable (default)** | A small set of high-availability modules: domain intel + sites that tend to return clear answers (e.g. Duolingo, Proton Mail, Adobe) |
-| **Full** | Loads 50+ self-maintained rules under `seek/definitions/` (noisier; many may fail on restricted networks) |
+| **Reliable (default)** | A dozen+ high-availability modules: domain intel + sites with clear verdicts (Adobe, Duolingo, Spotify, Twitter/X, WordPress, Mail.ru, etc.) |
+| **Full** | Loads 50+ self-maintained rules under `seek/definitions/` (broader coverage; some may be unknown / rate-limited) |
 | **Holehe (optional)** | Set `SEEK_ENABLE_HOLEHE=true` to add ~120 more modules (many may be broken or blocked) |
 
 No tool can guarantee “every website worldwide, always working.” `unknown` / failures are common and do **not** mean the app is broken.

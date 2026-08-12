@@ -15,14 +15,19 @@ request:
 
 rules:
   - registered_if:
-      json_path_truthy: "taken"
-    detail: 邮箱已被占用
+      status_in: [200]
+      json_path_equals:
+        path: "taken"
+        value: true
+    detail: 邮箱已被 Twitter/X 占用
   - not_registered_if:
-      status_in: ["200"]
+      status_in: [200]
       json_path_equals:
         path: "taken"
         value: false
+    detail: 邮箱在 Twitter/X 可用（通常表示未注册）
   - rate_limited_if:
-      status_in: ["429", "403"]
+      status_in: [429, 403]
 
 default: unknown
+default_detail: 接口返回格式与规则不匹配，可能已改版

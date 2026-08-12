@@ -80,6 +80,8 @@ async function init() {
     chip.addEventListener("click", () => setMode(chip.dataset.mode));
   });
 
+  initPwnedPassword();
+
   try {
     const [meta, providers] = await Promise.all([
       fetch("/api/meta").then((r) => r.json()),
@@ -89,6 +91,87 @@ async function init() {
   } catch (err) {
     toast("无法连接后端服务：" + err.message, true);
   }
+}
+
+/* ---------------- 密码泄露检测（HIBP Pwned Passwords，纯前端 k-匿名） ---------------- */
+function initPwnedPassword() {
+  const input = el("pwned-input");
+  const btn = el("pwned-check");
+  const result = el("pwned-result");
+  if (!input || !btn || !result) return;
+
+  async function sha1Hex(text) {
+    const bytes = new TextEncoder().encode(text);
+    const digest = await crypto.subtle.digest("SHA-1", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+      .toUpperCase();
+  }
+
+  async function run() {
+    const password = input.value;
+    if (!password) {
+      toast("请输入要检测的密码", true);
+      return;
+    }
+    if (!window.isSecureContext || !window.crypto || !window.crypto.subtle) {
+      toast("当前环境不支持 Web Crypto（需通过 HTTPS 或 localhost 访问）", true);
+      return;
+    }
+
+    btn.disabled = true;
+    const oldLabel = btn.textContent;
+    btn.textContent = "检测中…";
+    result.hidden = true;
+
+    try {
+      const hashHex = await sha1Hex(password);
+      const prefix = hashHex.slice(0, 5);
+      const suffix = hashHex.slice(5);
+
+      // 只把哈希前 5 位发给 HIBP 官方接口（k-匿名协议），密码/完整哈希永不出浏览器
+      const resp = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
+        headers: { "Add-Padding": "true" },
+      });
+      if (!resp.ok) throw new Error(`HIBP 接口返回 HTTP ${resp.status}`);
+      const text = await resp.text();
+
+      let count = 0;
+      for (const line of text.split("\n")) {
+        const idx = line.indexOf(":");
+        if (idx === -1) continue;
+        if (line.slice(0, idx).trim() === suffix) {
+          count = parseInt(line.slice(idx + 1), 10) || 0;
+          break;
+        }
+      }
+
+      result.hidden = false;
+      if (count > 0) {
+        result.className = "pwned-result bad";
+        result.innerHTML = `⚠️ 该密码已在已知数据泄露库中出现过 <strong>${count.toLocaleString(
+          "zh-CN"
+        )}</strong> 次，属于<strong>高风险密码</strong>，请立即更换，并检查是否在其他站点重复使用。`;
+      } else {
+        result.className = "pwned-result ok";
+        result.innerHTML = `✅ 未在 HIBP 已知泄露库（截至最近一次更新）中查到该密码的哈希。不代表绝对安全，仍建议使用密码管理器生成的唯一强密码。`;
+      }
+    } catch (err) {
+      result.hidden = false;
+      result.className = "pwned-result bad";
+      result.textContent = "检测失败：" + err.message + "（可能是网络无法访问 api.pwnedpasswords.com）";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldLabel;
+      input.value = "";
+    }
+  }
+
+  btn.addEventListener("click", run);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") run();
+  });
 }
 
 function setMode(mode) {

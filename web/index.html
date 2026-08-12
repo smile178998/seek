@@ -110,6 +110,20 @@
       <div id="empty" class="empty" hidden>没有符合当前筛选条件的结果</div>
     </section>
 
+    <section class="panel pwned-panel">
+      <h3>密码泄露检测 <span class="pwned-badge">官方免费 API · 密码不出浏览器</span></h3>
+      <p class="pwned-desc">
+        直接调用 <a href="https://haveibeenpwned.com/Passwords" target="_blank" rel="noreferrer">Have I Been Pwned · Pwned Passwords</a>
+        官方免费接口（k-匿名协议，无需 API Key）：密码在<strong>你的浏览器本地</strong>做哈希，只把哈希值的前 5 位发给对方服务器，
+        全程<strong>不经过本网站后端</strong>，密码明文不会被发送、记录或保存到任何地方。这也是 Firefox / Chrome / Edge 内置密码检查功能背后使用的同一套官方机制。
+      </p>
+      <div class="pwned-row">
+        <input id="pwned-input" type="password" placeholder="输入要检测的密码" autocomplete="new-password" />
+        <button id="pwned-check" class="btn btn-secondary">检测</button>
+      </div>
+      <div id="pwned-result" class="pwned-result" hidden></div>
+    </section>
+
     <section class="panel notice">
       <h3>使用须知</h3>
       <ul>
@@ -117,6 +131,7 @@
         <li>结果仅为探测推断：站点改版、风控拦截、CDN 缓存都可能造成误报或漏报，<strong>不可作为结论性证据</strong>。</li>
         <li>默认「可靠模式」只跑高可用模块；已注册为空通常表示未命中，不等于故障。完整覆盖可在 <code>.env</code> 设置 <code>SEEK_SCAN_PROFILE=full</code> / <code>SEEK_AI_PROFILE=full</code>。</li>
         <li>内置模块只使用站点<strong>官方公开提供</strong>的查询接口。如需扩展，请在 <code>seek/definitions/</code> 下自行添加规则，并自行确认合法性。</li>
+        <li>Firefox Monitor / Google 密码检查 / Edge 密码监控是绑定浏览器账号的产品功能，官方<strong>没有</strong>对外开放按邮箱查询的免费 API，无法在本工具中直接调用，建议手动登录对应产品查看。本页「密码泄露检测」用的是它们背后同源的 HIBP 官方免费接口，可直接使用。</li>
       </ul>
     </section>
   </main>

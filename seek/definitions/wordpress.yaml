@@ -2,24 +2,26 @@ name: wordpress
 title: WordPress.com
 category: dev
 homepage: https://wordpress.com
-description: 注册邮箱校验接口
+description: WordPress.com 公开用户 auth-options 接口（按邮箱查询）
 notes: 端点可能随站点改版失效；仅限本人或已授权目标
 
 request:
-  method: POST
-  url: "https://public-api.wordpress.com/rest/v1.1/users/validate"
+  method: GET
+  url: "https://public-api.wordpress.com/rest/v1.1/users/{email}/auth-options"
   headers:
-    Content-Type: "application/json"
-  json:
-    email: "{email}"
+    Accept: "application/json"
 
 rules:
-  - registered_if:
-      body_contains: ["already", "taken", "exists"]
-    detail: 邮箱已占用
   - not_registered_if:
-      status_in: ["200", "400"]
+      status_in: [404]
+      body_contains: ["unknown_user"]
+    detail: WordPress.com 无此用户
+  - registered_if:
+      status_in: [200]
+      body_not_contains: ["unknown_user"]
+    detail: WordPress.com 存在该邮箱相关账号
   - rate_limited_if:
-      status_in: ["429", "403"]
+      status_in: [429, 403]
 
 default: unknown
+default_detail: 接口返回格式与规则不匹配，可能已改版

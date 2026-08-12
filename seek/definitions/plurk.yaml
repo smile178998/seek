@@ -16,11 +16,12 @@ request:
 
 rules:
   - registered_if:
-      body_contains: ["true", "found"]
+      body_matches: '(?i)^\s*true\s*$'
     detail: 邮箱已找到
   - not_registered_if:
-      body_contains: ["false", "not found"]
+      body_matches: '(?i)^\s*false\s*$'
   - rate_limited_if:
-      status_in: ["429", "403"]
+      status_in: [429, 403]
 
 default: unknown
+default_detail: 接口返回格式与规则不匹配，可能已改版

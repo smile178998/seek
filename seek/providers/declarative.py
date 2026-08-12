@@ -224,9 +224,11 @@ class DeclarativeProvider(Provider):
 
     def _match_clause(self, key: str, expected: Any, scope: dict[str, Any]) -> bool:
         if key == "status_in":
-            return scope["status"] in _as_list(expected)
+            # YAML 里常写成 "200"，httpx 返回 int 200 —— 两边都归一化再比
+            wanted = {_norm_status(v) for v in _as_list(expected)}
+            return _norm_status(scope["status"]) in wanted
         if key == "status_eq":
-            return scope["status"] == expected
+            return _norm_status(scope["status"]) == _norm_status(expected)
         if key == "body_contains":
             return all(str(s) in scope["text"] for s in _as_list(expected))
         if key == "body_not_contains":
@@ -252,6 +254,14 @@ class DeclarativeProvider(Provider):
             if value is not None:
                 data[field] = value
         return data
+
+
+def _norm_status(value: Any) -> Any:
+    """把 HTTP 状态码统一成 int，无法转换则原样返回。"""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return value
 
 
 def build_provider_info(spec: dict[str, Any], source: str) -> ProviderInfo:

@@ -1,0 +1,30 @@
+name: mailru
+title: Mail.ru
+category: mail
+homepage: https://mail.ru
+description: Mail.ru 找回密码接口探测邮箱是否存在
+notes: 端点可能随站点改版失效；仅限本人或已授权目标
+
+request:
+  method: POST
+  url: "https://account.mail.ru/api/v1/user/password/restore"
+  headers:
+    Content-Type: "application/x-www-form-urlencoded"
+    Accept: "application/json"
+  data:
+    email: "{email}"
+    htmlencoded: "false"
+
+rules:
+  - not_registered_if:
+      body_contains: ["not_exists"]
+    detail: Mail.ru 判定邮箱不存在
+  - registered_if:
+      body_contains: ['"error":null']
+      body_not_contains: ["not_exists"]
+    detail: Mail.ru 找回流程接受该邮箱（通常表示已存在）
+  - rate_limited_if:
+      status_in: [429, 403]
+
+default: unknown
+default_detail: 接口返回格式与规则不匹配，可能已改版

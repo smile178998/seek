@@ -22,8 +22,13 @@ devrant
 flickr
 lastfm
 plurk
+cnblogs
+csdn
+gitee
+protonmail
+wattpad
 
-# Holehe 补充站点（已排除与上方自维护规则重复、以及 holehe_disabled.txt 中的失效模块）
+# Holehe 补充站点
 holehe_axonaut
 holehe_insightly
 holehe_mybb

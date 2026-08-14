@@ -52,7 +52,6 @@ const DATA_LABEL = {
 const el = (id) => document.getElementById(id);
 const state = {
   results: [],
-  activeCategories: new Set(),
   activeStatuses: new Set(),
   keyword: "",
   source: null,
@@ -64,10 +63,10 @@ const state = {
 
 /* ---------------- 初始化 ---------------- */
 async function init() {
-  el("run").addEventListener("click", start);
+  el("run").addEventListener("click", safeStart);
   el("stop").addEventListener("click", stop);
   el("email").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") start();
+    if (e.key === "Enter") safeStart();
   });
   el("keyword").addEventListener("input", (e) => {
     state.keyword = e.target.value.trim().toLowerCase();
@@ -79,98 +78,22 @@ async function init() {
     chip.addEventListener("click", () => setMode(chip.dataset.mode));
   });
 
-  initPwnedPassword();
-
   try {
-    const [meta, providers] = await Promise.all([
-      fetch("/api/meta").then((r) => r.json()),
-      fetch("/api/providers").then((r) => r.json()),
-    ]);
-    applyMeta(meta, providers);
+    const meta = await fetch("/api/meta").then((r) => r.json());
+    applyMeta(meta);
   } catch (err) {
     toast("无法连接后端服务：" + err.message, true);
   }
 }
 
-/* ---------------- 密码泄露检测（HIBP Pwned Passwords，纯前端 k-匿名） ---------------- */
-function initPwnedPassword() {
-  const input = el("pwned-input");
-  const btn = el("pwned-check");
-  const result = el("pwned-result");
-  if (!input || !btn || !result) return;
-
-  async function sha1Hex(text) {
-    const bytes = new TextEncoder().encode(text);
-    const digest = await crypto.subtle.digest("SHA-1", bytes);
-    return Array.from(new Uint8Array(digest))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("")
-      .toUpperCase();
+function safeStart() {
+  try {
+    start();
+  } catch (err) {
+    console.error("启动查询失败", err);
+    toast(`启动查询失败：${err.message || err}`, true);
+    setRunning(false);
   }
-
-  async function run() {
-    const password = input.value;
-    if (!password) {
-      toast("请输入要检测的密码", true);
-      return;
-    }
-    if (!window.isSecureContext || !window.crypto || !window.crypto.subtle) {
-      toast("当前环境不支持 Web Crypto（需通过 HTTPS 或 localhost 访问）", true);
-      return;
-    }
-
-    btn.disabled = true;
-    const oldLabel = btn.textContent;
-    btn.textContent = "检测中…";
-    result.hidden = true;
-
-    try {
-      const hashHex = await sha1Hex(password);
-      const prefix = hashHex.slice(0, 5);
-      const suffix = hashHex.slice(5);
-
-      // 只把哈希前 5 位发给 HIBP 官方接口（k-匿名协议），密码/完整哈希永不出浏览器
-      const resp = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
-        headers: { "Add-Padding": "true" },
-      });
-      if (!resp.ok) throw new Error(`HIBP 接口返回 HTTP ${resp.status}`);
-      const text = await resp.text();
-
-      let count = 0;
-      for (const line of text.split("\n")) {
-        const idx = line.indexOf(":");
-        if (idx === -1) continue;
-        if (line.slice(0, idx).trim() === suffix) {
-          count = parseInt(line.slice(idx + 1), 10) || 0;
-          break;
-        }
-      }
-
-      result.hidden = false;
-      if (count > 0) {
-        result.className = "pwned-result bad";
-        result.innerHTML = `⚠️ 该密码已在已知数据泄露库中出现过 <strong>${count.toLocaleString(
-          "zh-CN"
-        )}</strong> 次，属于<strong>高风险密码</strong>，请立即更换，并检查是否在其他站点重复使用。`;
-      } else {
-        result.className = "pwned-result ok";
-        result.innerHTML = `✅ 未在 HIBP 已知泄露库（截至最近一次更新）中查到该密码的哈希。不代表绝对安全，仍建议使用密码管理器生成的唯一强密码。`;
-      }
-    } catch (err) {
-      result.hidden = false;
-      result.className = "pwned-result bad";
-      result.textContent = "检测失败：" + err.message + "（可能是网络无法访问 api.pwnedpasswords.com）";
-    } finally {
-      btn.disabled = false;
-      btn.textContent = oldLabel;
-      input.value = "";
-    }
-  }
-
-  btn.addEventListener("click", run);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") run();
-  });
 }
 
 function setMode(mode) {
@@ -182,33 +105,15 @@ function setMode(mode) {
   document.querySelectorAll(".mode-chip").forEach((c) => {
     c.classList.toggle("on", c.dataset.mode === mode);
   });
-  el("filters-row").hidden = mode === "ai";
-  const fullWrap = el("full-toggle-wrap");
-  if (fullWrap) fullWrap.hidden = mode === "ai";
   el("run").querySelector(".btn-label").textContent =
     mode === "ai" ? "开始 AI 汇总" : "开始查询";
 }
 
-function applyMeta(meta, providers) {
-  const ready = providers.filter((p) => p.ready).length;
-
-  const quotaParts = [];
-  if (meta.rate_limit.scans > 0) {
-    quotaParts.push(`剩余额度 ${meta.rate_limit.remaining}/${meta.rate_limit.scans}`);
-  }
-  if (meta.allowed_domains.length) {
-    quotaParts.push(`仅限域名 ${meta.allowed_domains.join(" / ")}`);
-  }
-  el("meta-quota").textContent = quotaParts.join(" · ");
-  el("meta-quota").hidden = quotaParts.length === 0;
-
+function applyMeta(meta) {
   state.aiConfigured = !!(meta.ai && meta.ai.configured);
   const aiBtn = el("mode-ai");
   const aiHint = el("ai-status");
-  const profile = meta.scan_profile || "reliable";
   const aiProfile = (meta.ai && meta.ai.profile) || meta.ai_profile || "reliable";
-  el("meta-providers").textContent =
-    `${ready}/${providers.length} 个模块就绪 · ${profile === "full" ? "完整" : "可靠"}模式`;
   if (state.aiConfigured) {
     aiBtn.disabled = false;
     aiHint.textContent = `AI 已就绪 · ${meta.ai.model || ""} · ${aiProfile === "full" ? "完整" : "可靠"}档`;
@@ -217,33 +122,6 @@ function applyMeta(meta, providers) {
     aiHint.textContent = "配置 SEEK_AI_API_KEY 后可用 · 默认可靠模式";
   }
 
-  if (!meta.require_consent) el("consent-wrap").hidden = true;
-
-  const wrap = el("category-chips");
-  wrap.innerHTML = "";
-  meta.categories.forEach((cat) => {
-    const count = providers.filter((p) => p.category === cat).length;
-    const chip = document.createElement("button");
-    chip.className = "chip on";
-    chip.dataset.category = cat;
-    chip.textContent = `${CATEGORY_LABEL[cat] || cat} (${count})`;
-    chip.title = providers
-      .filter((p) => p.category === cat)
-      .map((p) => `${p.title}${p.ready ? "" : " · " + (p.unready_reason || "未就绪")}`)
-      .join("\n");
-    chip.addEventListener("click", () => {
-      chip.classList.toggle("on");
-      syncCategories();
-    });
-    wrap.appendChild(chip);
-  });
-  syncCategories();
-}
-
-function syncCategories() {
-  state.activeCategories = new Set(
-    [...document.querySelectorAll("#category-chips .chip.on")].map((c) => c.dataset.category)
-  );
 }
 
 /* ---------------- 扫描 ---------------- */
@@ -256,20 +134,6 @@ function start() {
     el("email").focus();
     return;
   }
-  const consentWrap = el("consent-wrap");
-  if (!consentWrap.hidden && !el("consent").checked) {
-    consentWrap.classList.remove("shake");
-    void consentWrap.offsetWidth;
-    consentWrap.classList.add("shake");
-    toast("请先勾选授权声明", true);
-    return;
-  }
-  const fullScan = !!(el("full-scan") && el("full-scan").checked);
-  if (state.mode === "scan" && !fullScan && state.activeCategories.size === 0) {
-    toast("请至少选择一个检测分类", true);
-    return;
-  }
-
   state.results = [];
   state.email = email;
   state.activeStatuses = new Set();
@@ -294,8 +158,7 @@ function start() {
   const params = new URLSearchParams({
     email,
     consent: "true",
-    only: fullScan ? "" : [...state.activeCategories].join(","),
-    profile: fullScan ? "full" : "reliable",
+    profile: "reliable",
   });
   const source = new EventSource(`/api/scan/stream?${params.toString()}`);
   state.source = source;
@@ -540,6 +403,17 @@ function setRunning(running) {
 
 /* ---------------- 渲染 ---------------- */
 const STATUS_ORDER = ["registered", "info", "unknown", "rate_limited", "not_registered", "error", "skipped"];
+const CATEGORY_ORDER = [
+  "domain", "mail", "breach", "profile", "social", "forum", "crm",
+  "dev", "edu", "jobs", "shop", "payment", "crowdfunding", "media",
+  "music", "sport", "transport", "medical", "realestate", "osint",
+  "adult", "other",
+];
+
+function categoryRank(category) {
+  const index = CATEGORY_ORDER.indexOf(category);
+  return index < 0 ? CATEGORY_ORDER.length : index;
+}
 
 function render() {
   renderStatusFilters();
@@ -549,12 +423,43 @@ function render() {
     .filter((r) => !state.keyword || `${r.title} ${r.provider}`.toLowerCase().includes(state.keyword))
     .sort(
       (a, b) =>
+        categoryRank(a.category) - categoryRank(b.category) ||
+        (CATEGORY_LABEL[a.category] || a.category).localeCompare(
+          CATEGORY_LABEL[b.category] || b.category,
+          "zh"
+        ) ||
         STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) ||
         a.title.localeCompare(b.title, "zh")
     );
 
   box.innerHTML = "";
-  rows.forEach((r) => box.appendChild(rowNode(r)));
+  const groups = new Map();
+  rows.forEach((r) => {
+    const category = r.category || "other";
+    if (!groups.has(category)) groups.set(category, []);
+    groups.get(category).push(r);
+  });
+  groups.forEach((groupRows, category) => {
+    const group = document.createElement("section");
+    group.className = "result-group";
+
+    const header = document.createElement("div");
+    header.className = "result-group-header";
+    const label = document.createElement("span");
+    label.className = "result-group-title";
+    label.textContent = CATEGORY_LABEL[category] || category;
+    const count = document.createElement("span");
+    count.className = "result-group-count";
+    count.textContent = String(groupRows.length);
+    header.append(label, count);
+    group.appendChild(header);
+
+    const groupRowsBox = document.createElement("div");
+    groupRowsBox.className = "result-group-rows";
+    groupRows.forEach((r) => groupRowsBox.appendChild(rowNode(r)));
+    group.appendChild(groupRowsBox);
+    box.appendChild(group);
+  });
   el("empty").hidden = rows.length > 0;
 }
 

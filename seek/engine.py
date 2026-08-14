@@ -69,7 +69,18 @@ class Engine:
         selected = filter_providers(self.providers, only, exclude)
         semaphore = asyncio.Semaphore(max(1, self.settings.concurrency))
         ctx = CheckContext(email=email, client=self.client, timeout=self.settings.timeout)
-        hard_timeout = self.settings.timeout + 5
+        # 网络层已有单请求超时；仅留少量清理余量，避免慢模块拖住整批扫描。
+        def detach(task: asyncio.Task[Result]) -> None:
+            """取消慢模块但不等待其连接清理，保证结果流按时结束。"""
+            task.cancel()
+
+            def consume(done: asyncio.Task[Result]) -> None:
+                try:
+                    done.exception()
+                except (asyncio.CancelledError, Exception):
+                    pass
+
+            task.add_done_callback(consume)
 
         async def run_one(provider: Provider) -> Result:
             if not provider.info.ready:
@@ -78,8 +89,15 @@ class Engine:
                 )
             async with semaphore:
                 try:
-                    return await asyncio.wait_for(provider.check(ctx), timeout=hard_timeout)
-                except asyncio.TimeoutError:
+                    check_task = asyncio.create_task(provider.check(ctx))
+                    done, _ = await asyncio.wait(
+                        {check_task}, timeout=provider.execution_timeout(ctx)
+                    )
+                    if not done:
+                        detach(check_task)
+                        return provider.make_result(Status.ERROR, detail="模块执行超时")
+                    return await check_task
+                except asyncio.TimeoutError:  # 兼容模块内部主动抛出的超时
                     return provider.make_result(Status.ERROR, detail="模块执行超时")
                 except asyncio.CancelledError:
                     raise
@@ -89,10 +107,33 @@ class Engine:
                         Status.ERROR, detail=f"模块异常: {type(exc).__name__}: {exc}"
                     )
 
-        tasks = [asyncio.create_task(run_one(p)) for p in selected]
+        async def run_pair(provider: Provider) -> tuple[Provider, Result]:
+            return provider, await run_one(provider)
+
+        tasks = [asyncio.create_task(run_pair(p)) for p in selected]
         try:
+            retryable: list[Provider] = []
             for finished in asyncio.as_completed(tasks):
-                yield await finished
+                provider, result = await finished
+                if _is_retryable_network_error(result):
+                    retryable.append(provider)
+                else:
+                    yield result
+
+            # Large batches can briefly exhaust DNS/TLS or remote connection
+            # capacity. Retry only transient failures after the main wave has
+            # drained, and use low concurrency for the retry wave.
+            retry_semaphore = asyncio.Semaphore(1)
+
+            async def retry_one(provider: Provider) -> tuple[Provider, Result]:
+                async with retry_semaphore:
+                    return await run_pair(provider)
+
+            retry_tasks = [asyncio.create_task(retry_one(p)) for p in retryable]
+            tasks.extend(retry_tasks)
+            for finished in asyncio.as_completed(retry_tasks):
+                _, result = await finished
+                yield result
         finally:
             for task in tasks:
                 if not task.done():
@@ -124,3 +165,30 @@ _STATUS_ORDER = {
     Status.ERROR: 5,
     Status.SKIPPED: 6,
 }
+
+
+def _is_retryable_network_error(result: Result) -> bool:
+    if result.status is not Status.ERROR:
+        return False
+    detail = (result.detail or "").lower()
+    markers = (
+        "timeout",
+        "timed out",
+        "connecterror",
+        "connection error",
+        "network error",
+        "proxyerror",
+        "remoteprotocolerror",
+        "http 408",
+        "http 425",
+        "http 483",
+        "http 500",
+        "http 502",
+        "http 503",
+        "http 504",
+        "瓒呮椂",
+        "缃戠粶",
+        "超时",
+        "网络",
+    )
+    return not detail or any(marker in detail for marker in markers)

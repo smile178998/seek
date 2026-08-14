@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
 
-    concurrency: int = 6
+    concurrency: int = 24
     timeout: float = 12.0
     user_agent: str = DEFAULT_USER_AGENT
     proxy: str | None = None
@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     holehe_disabled_file: Path = PACKAGE_DIR / "data" / "holehe_disabled.txt"
     # 可靠模块白名单（一行一个模块名）
     reliable_modules_file: Path = PACKAGE_DIR / "data" / "reliable_modules.txt"
+    user_scanner_modules_file: Path = PACKAGE_DIR / "data" / "user_scanner_reliable.txt"
     # 规则扫描默认档位：reliable（只跑白名单）| full（全部已启用规则）
     scan_profile: str = "reliable"
     # AI 聚合默认档位：reliable（白名单 + Gravatar/搜索，不跑 Holehe）| full（含 Holehe）

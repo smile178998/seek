@@ -31,9 +31,11 @@
 
 | 模式 | 说明 |
 | --- | --- |
-| **可靠模式（默认）** | 约 40 个实测可用模块：域名情报 + 自维护规则 + 经筛选的 Holehe 站点（Holehe 未安装时自动跳过） |
+| **可靠模式（默认）** | 130+ 个实测模块：域名情报 + 自维护规则 + [User Scanner](https://github.com/kaifcodec/user-scanner) / Holehe 站点；使用线程隔离和高并发加速 |
 | **完整模式** | 加载 `seek/definitions/` 下约 50+ 条自维护规则（覆盖更大，但部分会 unknown / 限流） |
 | **Holehe（可选）** | 完整模式下再加约 120 个站点模块（多数可能失效或被拦） |
+
+中国及中国团队站点包括：**CSDN、博客园（CNBlogs）、Gitee（码云）、HelloChinese、环球时报、她社区、万兴科技（Wondershare）**。手机号专用、强制验证码或会发送找回邮件的站点不会伪装成安全的邮箱检测结果。
 
 没有任何工具能保证「全世界网站都能查到且全部正常」。`unknown` / 失败很常见，不等于软件坏了。
 
@@ -90,8 +92,8 @@ python -m seek.cli ai you@example.com -y
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
 | `SEEK_HOST` / `SEEK_PORT` | `127.0.0.1` / `8000` | 服务地址 |
-| `SEEK_CONCURRENCY` | `12` | 并发数 |
-| `SEEK_TIMEOUT` | `18` | 单模块超时（秒） |
+| `SEEK_CONCURRENCY` | `24` | 并发数；兼顾 100+ 模块速度与 DNS 稳定性 |
+| `SEEK_TIMEOUT` | `12` | 普通模块单次超时；User Scanner 多步模块有独立总预算（上游每次请求最多 15 秒） |
 | `SEEK_SCAN_PROFILE` | `reliable` | `reliable` 或 `full` |
 | `SEEK_AI_PROFILE` | `reliable` | AI 聚合档位；`full` 会跑 Holehe |
 | `SEEK_PROXY` | 空 | 代理，如 `http://127.0.0.1:7890` |

@@ -261,9 +261,122 @@ def test_reliable_profile_includes_curated_holehe_only():
     assert "holehe_blip" in names
     assert "holehe_not_curated" not in names
     full_names = [provider.info.name for provider in full_providers]
-    assert "adobe" in full_names
+    assert "userscanner_adobe" in full_names
     assert "holehe_adobe" not in full_names
     print("[ok] 可靠模式只加载 Holehe 白名单模块")
+
+
+def test_user_scanner_curated_modules_load_and_map_status():
+    from types import SimpleNamespace
+
+    from seek.config import Settings
+    from seek.models import Status
+    from seek.providers.user_scanner_bridge import (
+        _map_status,
+        load_user_scanner_providers,
+    )
+
+    providers = load_user_scanner_providers(Settings().user_scanner_modules_file)
+    names = {provider.info.name for provider in providers}
+    assert len(providers) >= 100
+    assert "userscanner_dropbox" in names
+    assert "userscanner_huggingface" in names
+    assert _map_status("TAKEN", "") is Status.REGISTERED
+    assert _map_status("AVAILABLE", "") is Status.NOT_REGISTERED
+    assert _map_status("ERROR", "HTTP 429") is Status.RATE_LIMITED
+    assert _map_status("ERROR", "unexpected response") is Status.ERROR
+    assert providers[0].execution_timeout(SimpleNamespace(timeout=8.0)) >= 52.0
+    print(f"[ok] User Scanner curated modules loaded ({len(providers)})")
+
+
+def test_transient_network_error_is_retried_once():
+    from seek.config import Settings
+    from seek.models import ProviderInfo
+    from seek.providers.base import Provider
+
+    class FlakyProvider(Provider):
+        def __init__(self):
+            super().__init__(ProviderInfo(name="flaky", title="Flaky"))
+            self.calls = 0
+
+        async def check(self, ctx):
+            self.calls += 1
+            if self.calls == 1:
+                return self.make_result(Status.ERROR, detail="ConnectTimeout")
+            return self.make_result(Status.NOT_REGISTERED)
+
+    provider = FlakyProvider()
+
+    async def go():
+        settings = Settings(concurrency=2, timeout=0.1)
+        async with Engine([provider], settings=settings) as engine:
+            return await engine.scan(EMAIL)
+
+    response = asyncio.run(go())
+    assert provider.calls == 2
+    assert response.summary.total == 1
+    assert response.summary.not_registered == 1
+    assert response.summary.error == 0
+    print("[ok] transient network failures receive one low-concurrency retry")
+
+
+def test_chinese_site_rules_map_only_explicit_signals():
+    """中国站点规则必须依据明确响应，不能把任意 200/400 当成结论。"""
+    import yaml
+
+    definitions = Path(__file__).resolve().parents[1] / "seek" / "definitions"
+
+    cnblogs = yaml.safe_load((definitions / "cnblogs.yaml").read_text(encoding="utf-8"))
+    assert run_with_spec(
+        cnblogs, lambda request: httpx.Response(200, text='"邮箱已被绑定，请使用其他邮箱"')
+    )[0].status is Status.REGISTERED
+    assert run_with_spec(
+        cnblogs,
+        lambda request: httpx.Response(
+            200, text='"\\u90AE\\u7BB1\\u5DF2\\u88AB\\u7ED1\\u5B9A"'
+        ),
+    )[0].status is Status.REGISTERED
+    assert run_with_spec(cnblogs, lambda request: httpx.Response(200, text="true"))[
+        0
+    ].status is Status.NOT_REGISTERED
+
+    csdn = yaml.safe_load((definitions / "csdn.yaml").read_text(encoding="utf-8"))
+    assert run_with_spec(
+        csdn,
+        lambda request: httpx.Response(
+            200, json={"msg": "success", "code": "0", "status": True}
+        ),
+    )[0].status is Status.REGISTERED
+    assert run_with_spec(
+        csdn,
+        lambda request: httpx.Response(
+            400, json={"msg": "邮箱不存在", "code": "1014", "status": False}
+        ),
+    )[0].status is Status.NOT_REGISTERED
+    assert run_with_spec(
+        csdn,
+        lambda request: httpx.Response(
+            400, json={"msg": "邮箱格式不正确", "code": "1012", "status": False}
+        ),
+    )[0].status is Status.UNKNOWN
+
+    gitee = yaml.safe_load((definitions / "gitee.yaml").read_text(encoding="utf-8"))
+
+    def gitee_handler(status: int):
+        def handler(request: httpx.Request) -> httpx.Response:
+            if request.url.path == "/login":
+                return httpx.Response(
+                    200, text='<meta name="csrf-token" content="TOKEN123">'
+                )
+            assert request.headers["x-csrf-token"] == "TOKEN123"
+            return httpx.Response(200, json={"status": status, "data": None})
+
+        return handler
+
+    assert run_with_spec(gitee, gitee_handler(1))[0].status is Status.REGISTERED
+    assert run_with_spec(gitee, gitee_handler(0))[0].status is Status.NOT_REGISTERED
+    assert run_with_spec(gitee, gitee_handler(2))[0].status is Status.UNKNOWN
+    print("[ok] CSDN / CNBlogs / Gitee explicit status mapping")
 
 
 if __name__ == "__main__":

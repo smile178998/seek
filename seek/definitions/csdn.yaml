@@ -1,0 +1,33 @@
+name: csdn
+title: CSDN
+category: dev
+homepage: https://www.csdn.net
+description: 使用 CSDN 登录页公开调用的邮箱状态接口判断账号是否存在
+notes: 仅查询邮箱状态，不发送验证码或找回邮件；2026-08 已用随机邮箱和官方已存在邮箱验证
+
+request:
+  method: GET
+  url: "https://passport.csdn.net/v1/service/emails/{email_urlenc}"
+  headers:
+    Accept: "application/json, text/plain, */*"
+    Referer: "https://passport.csdn.net/login"
+    X-Requested-With: "XMLHttpRequest"
+
+rules:
+  - registered_if:
+      status_in: [200]
+      json_path_equals:
+        path: "status"
+        value: true
+    detail: CSDN 确认该邮箱账号存在
+  - not_registered_if:
+      status_in: [400]
+      json_path_equals:
+        path: "code"
+        value: "1014"
+    detail: CSDN 返回“邮箱不存在”
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown
+default_detail: CSDN 返回了未识别的状态，未作推断

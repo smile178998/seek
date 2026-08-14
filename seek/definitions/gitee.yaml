@@ -1,0 +1,50 @@
+name: gitee
+title: Gitee（码云）
+category: dev
+homepage: https://gitee.com
+description: 使用 Gitee 登录注册流程的公开邮箱状态接口判断账号是否存在
+notes: 先读取登录页 CSRF token，再查询邮箱状态；不会发送验证码或找回邮件；status=2 的受限邮箱不会误判为未注册
+
+prepare:
+  - method: GET
+    url: "https://gitee.com/login"
+    headers:
+      Accept: "text/html,application/xhtml+xml"
+      Accept-Language: "zh-CN,zh;q=0.9"
+    save:
+      csrf:
+        from: body_regex
+        pattern: '<meta name="csrf-token" content="([^"]+)"'
+        group: 1
+        required: true
+
+request:
+  method: POST
+  url: "https://gitee.com/check_oversea_email"
+  headers:
+    Accept: "application/json"
+    Origin: "https://gitee.com"
+    Referer: "https://gitee.com/login"
+    X-CSRF-Token: "{csrf}"
+    X-Requested-With: "XMLHttpRequest"
+  data:
+    number: "{email}"
+
+rules:
+  - registered_if:
+      status_in: [200]
+      json_path_equals:
+        path: "status"
+        value: 1
+    detail: Gitee 确认该邮箱账号存在
+  - not_registered_if:
+      status_in: [200]
+      json_path_equals:
+        path: "status"
+        value: 0
+    detail: Gitee 未发现该邮箱账号
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown
+default_detail: Gitee 返回受限邮箱或未识别状态，未作注册结论

@@ -212,22 +212,6 @@ body {
 }
 .mode-hint { font-size: 12px; color: var(--muted); }
 
-.full-toggle {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  color: var(--muted);
-  cursor: pointer;
-  user-select: none;
-}
-.full-toggle input { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
-.full-toggle:hover { color: var(--text); }
-
-.filters { margin-top: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.filters-label { font-size: 12.5px; color: var(--muted); }
-
 .ai-report h3 { margin: 0 0 8px; font-size: 15px; }
 .ai-report h4 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 600; }
 .ai-stats {
@@ -258,68 +242,6 @@ body {
 }
 .ai-stat.ok strong { color: #7dcea0; }
 
-/* ---------- 密码泄露检测（HIBP Pwned Passwords） ---------- */
-.pwned-panel h3 {
-  margin: 0 0 8px;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.pwned-badge {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--ok);
-  background: rgba(53, 211, 153, 0.12);
-  border: 1px solid rgba(53, 211, 153, 0.35);
-  border-radius: 999px;
-  padding: 2px 10px;
-}
-.pwned-desc {
-  margin: 0 0 14px;
-  font-size: 12.5px;
-  color: var(--muted);
-  line-height: 1.7;
-}
-.pwned-desc a { color: var(--accent); }
-.pwned-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.pwned-row input {
-  flex: 1;
-  min-width: 220px;
-  padding: 11px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text);
-  font-size: 14px;
-}
-.pwned-row input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-.pwned-result {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  line-height: 1.6;
-  border: 1px solid var(--border);
-}
-.pwned-result.ok {
-  color: #7dcea0;
-  background: rgba(53, 211, 153, 0.08);
-  border-color: rgba(53, 211, 153, 0.3);
-}
-.pwned-result.bad {
-  color: #ff9a9a;
-  background: rgba(255, 107, 107, 0.08);
-  border-color: rgba(255, 107, 107, 0.3);
-}
 .ai-stat.warn strong { color: #e6b35c; }
 .ai-summary { margin: 0 0 14px; color: #cfd7e6; line-height: 1.55; }
 .ai-cols {
@@ -365,28 +287,6 @@ body {
   background: rgba(91, 140, 255, 0.16);
   border-color: var(--accent);
   color: #cddcff;
-}
-
-.consent {
-  margin-top: 16px;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  font-size: 13px;
-  color: var(--muted);
-  cursor: pointer;
-  padding: 12px 14px;
-  border: 1px dashed var(--border-strong);
-  border-radius: 11px;
-}
-.consent input { margin-top: 3px; accent-color: var(--accent); flex: 0 0 auto; }
-.consent strong { color: #d6ddec; }
-.consent.shake { animation: shake 0.35s; border-color: var(--bad); }
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  75% { transform: translateX(6px); }
 }
 
 /* ---------- 进度 ---------- */
@@ -459,7 +359,48 @@ body {
 }
 .mini-input:focus { border-color: var(--accent); }
 
-.results { display: flex; flex-direction: column; }
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 14px;
+}
+
+.result-group {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 12px;
+  background: rgba(8, 10, 16, 0.2);
+}
+
+.result-group-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+  background: linear-gradient(90deg, rgba(91, 134, 255, 0.12), rgba(139, 92, 246, 0.04));
+}
+
+.result-group-title {
+  color: #dce5f7;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.result-group-count {
+  min-width: 24px;
+  padding: 1px 7px;
+  border: 1px solid rgba(118, 151, 255, 0.25);
+  border-radius: 999px;
+  color: #9fb4ef;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-align: center;
+}
+
+.result-group-rows { padding: 0 12px; }
 
 .row {
   display: flex;
@@ -469,7 +410,7 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   animation: fadeIn 0.25s ease both;
 }
-.row:last-child { border-bottom: none; }
+.result-group-rows .row:last-child { border-bottom: none; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }

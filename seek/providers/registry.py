@@ -11,6 +11,7 @@ from .base import Provider
 from .builtin import BUILTIN_FACTORIES
 from .declarative import DeclarativeProvider, build_provider_info
 from .holehe_bridge import load_holehe_providers
+from .user_scanner_bridge import load_user_scanner_providers
 
 log = logging.getLogger(__name__)
 
@@ -66,13 +67,26 @@ def load_providers(
         if spec.get("enabled", True) and "request" in spec
     }
 
+    user_scanner_providers = load_user_scanner_providers(
+        settings.user_scanner_modules_file
+    )
+    user_scanner_keys = {
+        _site_key(provider.name.removeprefix("userscanner_"))
+        for provider in user_scanner_providers
+    }
+    providers.extend(user_scanner_providers)
+
     if include_holehe:
         disabled = settings.disabled_holehe()
         for provider in load_holehe_providers():
             short = provider.info.name
             if short.startswith("holehe_"):
                 short = short[len("holehe_") :]
-            if short in disabled or _site_key(short) in definition_keys:
+            if (
+                short in disabled
+                or _site_key(short) in definition_keys
+                or _site_key(short) in user_scanner_keys
+            ):
                 continue
             providers.append(provider)
         if disabled:
@@ -86,13 +100,21 @@ def load_providers(
         if "request" not in spec:
             log.error("规则缺少 request 段: %s", path.name)
             continue
+        if _site_key(info.name) in user_scanner_keys:
+            log.debug("using user-scanner instead of duplicate YAML module: %s", info.name)
+            continue
         providers.append(DeclarativeProvider(info, spec))
 
     if profile == "reliable":
         allow = settings.reliable_modules()
         if allow:
             before = len(providers)
-            providers = [p for p in providers if p.info.name.lower() in allow]
+            providers = [
+                p
+                for p in providers
+                if p.info.name.lower() in allow
+                or p.info.name.startswith("userscanner_")
+            ]
             log.info("可靠模式：%d/%d 个模块", len(providers), before)
 
     providers.sort(key=lambda p: (p.info.category, p.info.name))

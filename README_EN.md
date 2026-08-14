@@ -31,9 +31,11 @@ Results are heuristic signals only (site changes, anti-bot controls, and network
 
 | Mode | Description |
 | --- | --- |
-| **Reliable (default)** | About 40 live-tested modules: domain intel + maintained rules + curated Holehe sites (automatically skipped when Holehe is not installed) |
+| **Reliable (default)** | 130+ tested modules with thread isolation and high-concurrency scheduling |
 | **Full** | Loads 50+ self-maintained rules under `seek/definitions/` (broader coverage; some may be unknown / rate-limited) |
 | **Holehe (optional)** | Full mode adds ~120 more modules (many may be broken or blocked) |
+
+Chinese coverage includes **CSDN, CNBlogs, Gitee, HelloChinese, Global Times, and MeetYou**. Phone-only or mandatory-CAPTCHA services are not presented as email-account checks.
 
 No tool can guarantee “every website worldwide, always working.” `unknown` / failures are common and do **not** mean the app is broken.
 
@@ -90,8 +92,8 @@ Copy `.env.example` to `.env` and edit as needed:
 | Variable | Default | Description |
 | --- | --- | --- |
 | `SEEK_HOST` / `SEEK_PORT` | `127.0.0.1` / `8000` | Listen address |
-| `SEEK_CONCURRENCY` | `12` | Concurrent requests |
-| `SEEK_TIMEOUT` | `18` | Per-module timeout (seconds) |
+| `SEEK_CONCURRENCY` | `24` | Concurrent requests; balances 100+ module speed and DNS stability |
+| `SEEK_TIMEOUT` | `12` | Native-rule timeout; multi-step User Scanner checks get a separate whole-check budget (upstream allows 15 seconds per request) |
 | `SEEK_SCAN_PROFILE` | `reliable` | `reliable` or `full` |
 | `SEEK_AI_PROFILE` | `reliable` | AI aggregation profile; `full` includes Holehe |
 | `SEEK_PROXY` | empty | Proxy, e.g. `http://127.0.0.1:7890` |

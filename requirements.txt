@@ -13,5 +13,6 @@ truststore==0.10.1
 
 # 可选：启用约 120 个站点的注册探测模块（AI 探查会自动调用）
 holehe==1.61
+user-scanner==1.5.0
 # 可选：再多一层社交平台邮箱占用检测（AI 探查会自动调用）
 # socialscan

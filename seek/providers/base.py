@@ -29,6 +29,10 @@ class Provider(abc.ABC):
     def name(self) -> str:
         return self.info.name
 
+    def execution_timeout(self, ctx: CheckContext) -> float:
+        """Return the scheduler's wall-clock budget for this provider."""
+        return ctx.timeout + 2.0
+
     @abc.abstractmethod
     async def check(self, ctx: CheckContext) -> Result:  # pragma: no cover - 接口定义
         ...

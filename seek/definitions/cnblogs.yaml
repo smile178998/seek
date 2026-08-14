@@ -1,0 +1,36 @@
+name: cnblogs
+title: 博客园（CNBlogs）
+category: dev
+homepage: https://www.cnblogs.com
+description: 使用博客园注册页的公开邮箱占用校验接口判断账号是否存在
+notes: 仅执行可用性校验，不发送验证码或找回邮件；2026-08 已用随机邮箱和官方已绑定邮箱验证
+
+request:
+  method: POST
+  url: "https://account.cnblogs.com/account/checkEmail"
+  headers:
+    Accept: "application/json, text/plain, */*"
+    Origin: "https://account.cnblogs.com"
+    Referer: "https://account.cnblogs.com/signup"
+    X-Requested-With: "XMLHttpRequest"
+  data:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      status_in: [200]
+      body_contains: ["邮箱已被绑定"]
+    detail: 该邮箱已绑定博客园账号
+  - registered_if:
+      status_in: [200]
+      body_matches: '\\u90ae\\u7bb1\\u5df2\\u88ab\\u7ed1\\u5b9a'
+    detail: 该邮箱已绑定博客园账号
+  - not_registered_if:
+      status_in: [200]
+      body_matches: "^\\s*true\\s*$"
+    detail: 博客园未发现该邮箱
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown
+default_detail: 博客园返回了未识别的校验结果，未作推断

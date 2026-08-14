@@ -31,7 +31,7 @@ Results are heuristic signals only (site changes, anti-bot controls, and network
 
 | Mode | Description |
 | --- | --- |
-| **Reliable (default)** | A dozen+ high-availability modules: domain intel + sites with clear verdicts (Adobe, Duolingo, Spotify, Twitter/X, WordPress, Mail.ru, etc.) |
+| **Reliable (default)** | About 40 live-tested modules: domain intel + maintained rules + curated Holehe sites (automatically skipped when Holehe is not installed) |
 | **Full** | Loads 50+ self-maintained rules under `seek/definitions/` (broader coverage; some may be unknown / rate-limited) |
 | **Holehe (optional)** | Full mode adds ~120 more modules (many may be broken or blocked) |
 

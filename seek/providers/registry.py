@@ -15,6 +15,11 @@ from .holehe_bridge import load_holehe_providers
 log = logging.getLogger(__name__)
 
 
+def _site_key(name: str) -> str:
+    """归一化站点名，用于去掉 YAML 与 Holehe 的重复模块。"""
+    return "".join(char for char in name.lower() if char.isalnum())
+
+
 def load_definition_files(directory: Path) -> list[tuple[Path, dict[str, Any]]]:
     specs: list[tuple[Path, dict[str, Any]]] = []
     if not directory.exists():
@@ -43,28 +48,37 @@ def load_providers(
     - profile=reliable（默认）：只保留白名单高可用模块，减少 unknown/失败噪声。
     - profile=full：加载全部 YAML 规则，并按需接入 Holehe 的上百个站点模块（覆盖最大，噪声更大）。
 
-    include_holehe 为 None 时按 profile 推断：full 档默认接入 Holehe，reliable 档不接入。
+    include_holehe 为 None 时会接入 Holehe：full 档保留所有未禁用模块，
+    reliable 档只保留 reliable_modules_file 白名单中的模块。
     """
     settings = settings or get_settings()
     profile = settings.normalize_profile(profile, kind="scan")
     if include_holehe is None:
-        include_holehe = profile == "full"
+        # reliable 档也会加载 Holehe，但最后只保留白名单中经过筛选的模块。
+        # Holehe 未安装时 load_holehe_providers() 返回空列表，不影响自维护规则。
+        include_holehe = True
 
     providers: list[Provider] = [factory() for factory in BUILTIN_FACTORIES]
+    definition_files = load_definition_files(settings.definitions_dir)
+    definition_keys = {
+        _site_key(str(spec.get("name") or path.stem))
+        for path, spec in definition_files
+        if spec.get("enabled", True) and "request" in spec
+    }
 
-    if include_holehe and profile == "full":
+    if include_holehe:
         disabled = settings.disabled_holehe()
         for provider in load_holehe_providers():
             short = provider.info.name
             if short.startswith("holehe_"):
                 short = short[len("holehe_") :]
-            if short in disabled:
+            if short in disabled or _site_key(short) in definition_keys:
                 continue
             providers.append(provider)
         if disabled:
             log.info("已按禁用清单跳过 %d 个 holehe 模块", len(disabled))
 
-    for path, spec in load_definition_files(settings.definitions_dir):
+    for path, spec in definition_files:
         info = build_provider_info(spec, path.stem)
         if not info.enabled:
             log.debug("规则已禁用，跳过: %s", info.name)

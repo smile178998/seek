@@ -1,7 +1,7 @@
 """多工具聚合层：把同类「邮箱注册痕迹」工具跑一遍，汇总证据给 AI 总结。
 
 档位：
-  reliable — 白名单规则 + Gravatar + 网页搜索 (+ socialscan)；不跑 Holehe
+  reliable — 白名单规则 + 经筛选的 Holehe 模块 + Gravatar + 网页搜索 (+ socialscan)
   full     — 全部 seek 规则 + Holehe（应用禁用清单）+ 其余工具
 
 说明：没有任何工具能保证「找出所有注册网站」；可靠模式优先给出明确判定。
@@ -90,11 +90,17 @@ async def run_seek_rules(
     emit: Emit | None = None,
     profile: str = "reliable",
 ) -> dict[str, Any]:
-    providers = load_providers(settings, profile=profile, include_holehe=False)
+    resolved_profile = settings.normalize_profile(profile, kind="scan")
+    # full 档的 Holehe 由 run_holehe() 单独跑，避免重复；reliable 档只保留白名单模块。
+    providers = load_providers(
+        settings,
+        profile=resolved_profile,
+        include_holehe=resolved_profile == "reliable",
+    )
     await _emit(emit, "backend_start", {
         "name": "seek_rules",
         "modules": len(providers),
-        "profile": settings.normalize_profile(profile, kind="scan"),
+        "profile": resolved_profile,
     })
     async with Engine(providers, settings) as engine:
         response = await engine.scan(email)

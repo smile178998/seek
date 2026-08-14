@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import asyncio
+import time
 from pathlib import Path
 
 import dns.asyncresolver
 import dns.exception
 import dns.resolver
+import httpx
 
 from ...models import ProviderInfo, Result, Status
 from ...utils import split_email
@@ -12,6 +15,10 @@ from ..base import CheckContext, Provider, Timer
 from . import register
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+MX_CACHE_TTL = 300.0
+DOH_ENDPOINT = "https://dns.alidns.com/resolve"
+_mx_cache: dict[str, tuple[float, tuple[list[str], bool]]] = {}
+_mx_inflight: dict[str, asyncio.Task[tuple[list[str], bool]]] = {}
 
 # MX 主机名特征 -> 邮箱服务商
 MX_FINGERPRINTS: list[tuple[str, str]] = [
@@ -44,20 +51,96 @@ MX_FINGERPRINTS: list[tuple[str, str]] = [
 ]
 
 
-async def _resolve_mx(domain: str) -> tuple[list[str], bool]:
+def _mx_records(answers) -> tuple[list[str], bool]:
+    records = sorted(
+        (
+            (int(record.preference), str(record.exchange).rstrip(".").lower())
+            for record in answers
+        ),
+        key=lambda item: item[0],
+    )
+    hosts = [host for _preference, host in records if host]
+    return hosts, bool(records) and not hosts
+
+
+async def _query_mx_doh(
+    domain: str,
+    client: httpx.AsyncClient,
+) -> tuple[list[str], bool]:
+    """在本地 UDP DNS 不可用时通过 HTTPS 查询 MX。"""
+    try:
+        response = await client.get(
+            DOH_ENDPOINT,
+            params={"name": domain, "type": "MX"},
+            headers={"Accept": "application/dns-json"},
+            timeout=8.0,
+        )
+        response.raise_for_status()
+        payload = response.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        raise dns.exception.DNSException(f"HTTPS DNS 查询失败: {exc}") from exc
+
+    status = int(payload.get("Status", -1))
+    if status == 3:
+        raise dns.resolver.NXDOMAIN
+    if status != 0:
+        raise dns.exception.DNSException(f"HTTPS DNS 返回状态 {status}")
+
+    records: list[tuple[int, str]] = []
+    for answer in payload.get("Answer") or []:
+        if int(answer.get("type", 0)) != 15:
+            continue
+        parts = str(answer.get("data") or "").strip().split(maxsplit=1)
+        if len(parts) != 2:
+            continue
+        records.append((int(parts[0]), parts[1].strip('"').rstrip(".").lower()))
+    if not records:
+        raise dns.resolver.NoAnswer
+    records.sort(key=lambda item: item[0])
+    hosts = [host for _preference, host in records if host]
+    return hosts, bool(records) and not hosts
+
+
+async def _query_mx(
+    domain: str,
+    client: httpx.AsyncClient,
+) -> tuple[list[str], bool]:
     """返回 (按优先级排序的 MX 主机, 是否为 Null MX)。
 
     Null MX（RFC 7505）是一条 exchange 为 "." 的记录，表示该域名明确不接收邮件。
     """
     resolver = dns.asyncresolver.Resolver()
     resolver.lifetime = 6.0
-    answers = await resolver.resolve(domain, "MX")
-    records = sorted(
-        ((int(r.preference), str(r.exchange).rstrip(".").lower()) for r in answers),
-        key=lambda item: item[0],
-    )
-    hosts = [host for _pref, host in records if host]
-    return hosts, bool(records) and not hosts
+    try:
+        answers = await resolver.resolve(domain, "MX")
+    except dns.exception.Timeout:
+        # 公共 UDP DNS 在部分公司/容器网络也会被拦，因此回退到 DoH。
+        return await _query_mx_doh(domain, client)
+    return _mx_records(answers)
+
+
+async def _resolve_mx(
+    domain: str,
+    client: httpx.AsyncClient,
+) -> tuple[list[str], bool]:
+    """合并同一域名的并发查询并短期缓存，避免 MX 与邮箱服务商模块重复压垮 DNS。"""
+    key = domain.strip().lower()
+    now = time.monotonic()
+    cached = _mx_cache.get(key)
+    if cached and now - cached[0] < MX_CACHE_TTL:
+        return cached[1]
+
+    task = _mx_inflight.get(key)
+    if task is None:
+        task = asyncio.create_task(_query_mx(key, client))
+        _mx_inflight[key] = task
+    try:
+        result = await task
+        _mx_cache[key] = (time.monotonic(), result)
+        return result
+    finally:
+        if _mx_inflight.get(key) is task:
+            _mx_inflight.pop(key, None)
 
 
 class MxProvider(Provider):
@@ -78,7 +161,7 @@ class MxProvider(Provider):
         _local, domain = split_email(ctx.email)
         with Timer() as timer:
             try:
-                hosts, null_mx = await _resolve_mx(domain)
+                hosts, null_mx = await _resolve_mx(domain, ctx.client)
             except dns.resolver.NXDOMAIN:
                 return self.make_result(
                     Status.NOT_REGISTERED,
@@ -128,7 +211,7 @@ class MailProviderProvider(Provider):
         _local, domain = split_email(ctx.email)
         with Timer() as timer:
             try:
-                hosts, null_mx = await _resolve_mx(domain)
+                hosts, null_mx = await _resolve_mx(domain, ctx.client)
             except dns.exception.DNSException as exc:
                 return self.make_result(
                     Status.ERROR, elapsed_ms=timer.ms, detail=f"DNS 查询失败: {exc}"

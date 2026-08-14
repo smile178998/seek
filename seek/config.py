@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
 
-    concurrency: int = 12
+    concurrency: int = 6
     timeout: float = 12.0
     user_agent: str = DEFAULT_USER_AGENT
     proxy: str | None = None

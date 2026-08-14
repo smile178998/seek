@@ -234,6 +234,38 @@ def test_definitions_all_parse():
     print(f"[ok] 规则文件全部解析通过（共 {len(providers)} 个模块）")
 
 
+def test_reliable_profile_includes_curated_holehe_only():
+    from unittest.mock import patch
+
+    from seek.config import Settings
+    from seek.models import ProviderInfo
+    from seek.providers.base import Provider
+    from seek.providers.registry import load_providers
+
+    class FakeProvider(Provider):
+        async def check(self, ctx):  # pragma: no cover - 本测试只验证加载筛选
+            raise NotImplementedError
+
+    curated = FakeProvider(ProviderInfo(name="holehe_blip", title="Blip"))
+    unlisted = FakeProvider(ProviderInfo(name="holehe_not_curated", title="Other"))
+    duplicate = FakeProvider(ProviderInfo(name="holehe_adobe", title="Adobe"))
+
+    with patch(
+        "seek.providers.registry.load_holehe_providers",
+        return_value=[curated, unlisted, duplicate],
+    ):
+        providers = load_providers(Settings(), profile="reliable")
+        full_providers = load_providers(Settings(), profile="full")
+
+    names = {provider.info.name for provider in providers}
+    assert "holehe_blip" in names
+    assert "holehe_not_curated" not in names
+    full_names = [provider.info.name for provider in full_providers]
+    assert "adobe" in full_names
+    assert "holehe_adobe" not in full_names
+    print("[ok] 可靠模式只加载 Holehe 白名单模块")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):

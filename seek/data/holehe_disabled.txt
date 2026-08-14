@@ -59,3 +59,27 @@ demonforums
 nattyornot
 nike
 tumblr
+
+# ---------- 2026-08-14 本机实测：接口改版、持续拦截或无明确判定 ----------
+voxmedia
+nocrm
+nutshell
+teamleader
+ndemiccreations
+nextpvr
+onlinesequencer
+thecardboard
+therianguide
+thevapingforum
+tunefind
+sevencups
+pornhub
+redtube
+vrbo
+dominosfr
+odnoklassniki
+xnxx
+office365
+parler
+coroflot
+caringbridge

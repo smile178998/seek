@@ -124,13 +124,3 @@ _STATUS_ORDER = {
     Status.ERROR: 5,
     Status.SKIPPED: 6,
 }
-
-
-async def scan_email(
-    email: str,
-    only: list[str] | None = None,
-    exclude: list[str] | None = None,
-    settings: Settings | None = None,
-) -> ScanResponse:
-    async with Engine(settings=settings) as engine:
-        return await engine.scan(email, only, exclude)

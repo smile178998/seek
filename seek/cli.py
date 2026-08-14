@@ -72,7 +72,7 @@ def cmd_scan(
         raise typer.Exit(2)
 
     settings = get_settings()
-    _local, domain = split_email(normalized)
+    domain = split_email(normalized)[1]
     if not settings.is_domain_allowed(domain):
         console.print(f"[red]域名 {domain} 不在 SEEK_ALLOWED_DOMAINS 允许列表内[/]")
         raise typer.Exit(3)

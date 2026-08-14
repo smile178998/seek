@@ -76,10 +76,6 @@ def render(template: str, ctx: dict[str, Any]) -> str:
     return _VAR_RE.sub(_sub, template)
 
 
-def render_mapping(mapping: dict[str, str], ctx: dict[str, Any]) -> dict[str, str]:
-    return {render(k, ctx): render(v, ctx) for k, v in mapping.items()}
-
-
 def render_any(value: Any, ctx: dict[str, Any]) -> Any:
     if isinstance(value, str):
         return render(value, ctx)

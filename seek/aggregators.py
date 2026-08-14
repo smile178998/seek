@@ -22,11 +22,8 @@ import httpx
 from .config import Settings, build_ssl_verify
 from .engine import Engine
 from .models import Result, Status
-from .providers.base import Provider
-from .providers.builtin import BUILTIN_FACTORIES
-from .providers.declarative import DeclarativeProvider, build_provider_info
 from .providers.holehe_bridge import holehe_available, load_holehe_providers
-from .providers.registry import load_definition_files
+from .providers.registry import load_providers
 
 log = logging.getLogger(__name__)
 
@@ -43,26 +40,6 @@ async def _emit(emit: Emit | None, event: str, data: dict[str, Any]) -> None:
 
 def _digest_sha256(email: str) -> str:
     return hashlib.sha256(email.strip().lower().encode("utf-8")).hexdigest()
-
-
-def load_seek_rule_providers(
-    settings: Settings,
-    profile: str = "reliable",
-) -> list[Provider]:
-    """本项目自有规则（不含 Holehe）。reliable 时按白名单过滤。"""
-    providers: list[Provider] = [factory() for factory in BUILTIN_FACTORIES]
-    for path, spec in load_definition_files(settings.definitions_dir):
-        info = build_provider_info(spec, path.stem)
-        if not info.enabled or "request" not in spec:
-            continue
-        providers.append(DeclarativeProvider(info, spec))
-
-    profile = settings.normalize_profile(profile, kind="scan")
-    if profile == "reliable":
-        allow = settings.reliable_modules()
-        if allow:
-            providers = [p for p in providers if p.info.name.lower() in allow]
-    return providers
 
 
 def _compact_results(results: list[Result], source: str) -> dict[str, Any]:
@@ -113,7 +90,7 @@ async def run_seek_rules(
     emit: Emit | None = None,
     profile: str = "reliable",
 ) -> dict[str, Any]:
-    providers = load_seek_rule_providers(settings, profile=profile)
+    providers = load_providers(settings, profile=profile, include_holehe=False)
     await _emit(emit, "backend_start", {
         "name": "seek_rules",
         "modules": len(providers),

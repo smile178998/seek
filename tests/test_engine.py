@@ -226,7 +226,7 @@ def test_prepare_missing_required_token():
 def test_definitions_all_parse():
     from seek.providers.registry import load_providers
 
-    providers = load_providers()
+    providers = load_providers(profile="full", include_holehe=False)
     assert len(providers) >= 50, f"模块过少: {len(providers)}"
     names = {p.info.name for p in providers}
     assert "example_site" not in names

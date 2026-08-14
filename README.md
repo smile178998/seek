@@ -33,7 +33,7 @@
 | --- | --- |
 | **可靠模式（默认）** | 十余个高可用模块：域名情报 + 实测可明确判定的站点（Adobe、Duolingo、Spotify、Twitter/X、WordPress、Mail.ru 等） |
 | **完整模式** | 加载 `seek/definitions/` 下约 50+ 条自维护规则（覆盖更大，但部分会 unknown / 限流） |
-| **Holehe（可选）** | `SEEK_ENABLE_HOLEHE=true` 后再加约 120 个站点模块（多数可能失效或被拦） |
+| **Holehe（可选）** | 完整模式下再加约 120 个站点模块（多数可能失效或被拦） |
 
 没有任何工具能保证「全世界网站都能查到且全部正常」。`unknown` / 失败很常见，不等于软件坏了。
 
@@ -94,7 +94,6 @@ python -m seek.cli ai you@example.com -y
 | `SEEK_TIMEOUT` | `18` | 单模块超时（秒） |
 | `SEEK_SCAN_PROFILE` | `reliable` | `reliable` 或 `full` |
 | `SEEK_AI_PROFILE` | `reliable` | AI 聚合档位；`full` 会跑 Holehe |
-| `SEEK_ENABLE_HOLEHE` | `false` | 是否加载 Holehe 模块 |
 | `SEEK_PROXY` | 空 | 代理，如 `http://127.0.0.1:7890` |
 | `SEEK_ALLOWED_DOMAINS` | 空 | 允许查询的邮箱域名（逗号分隔） |
 | `SEEK_REQUIRE_CONSENT` | `true` | 是否强制勾选授权声明 |

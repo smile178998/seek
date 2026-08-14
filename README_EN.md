@@ -33,7 +33,7 @@ Results are heuristic signals only (site changes, anti-bot controls, and network
 | --- | --- |
 | **Reliable (default)** | A dozen+ high-availability modules: domain intel + sites with clear verdicts (Adobe, Duolingo, Spotify, Twitter/X, WordPress, Mail.ru, etc.) |
 | **Full** | Loads 50+ self-maintained rules under `seek/definitions/` (broader coverage; some may be unknown / rate-limited) |
-| **Holehe (optional)** | Set `SEEK_ENABLE_HOLEHE=true` to add ~120 more modules (many may be broken or blocked) |
+| **Holehe (optional)** | Full mode adds ~120 more modules (many may be broken or blocked) |
 
 No tool can guarantee “every website worldwide, always working.” `unknown` / failures are common and do **not** mean the app is broken.
 
@@ -94,7 +94,6 @@ Copy `.env.example` to `.env` and edit as needed:
 | `SEEK_TIMEOUT` | `18` | Per-module timeout (seconds) |
 | `SEEK_SCAN_PROFILE` | `reliable` | `reliable` or `full` |
 | `SEEK_AI_PROFILE` | `reliable` | AI aggregation profile; `full` includes Holehe |
-| `SEEK_ENABLE_HOLEHE` | `false` | Load Holehe modules |
 | `SEEK_PROXY` | empty | Proxy, e.g. `http://127.0.0.1:7890` |
 | `SEEK_ALLOWED_DOMAINS` | empty | Allowed email domains (comma-separated) |
 | `SEEK_REQUIRE_CONSENT` | `true` | Require consent checkbox in the UI |

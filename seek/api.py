@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__
@@ -62,7 +62,7 @@ def guard(request: Request, email: str, consent: bool) -> str:
     if settings.require_consent and not consent:
         raise HTTPException(status_code=403, detail="需要先确认授权声明才能发起查询")
 
-    _local, domain = split_email(normalized)
+    domain = split_email(normalized)[1]
     if not settings.is_domain_allowed(domain):
         raise HTTPException(
             status_code=403,
@@ -248,8 +248,3 @@ if _settings.web_dir.exists():
     @app.get("/", include_in_schema=False)
     async def index() -> FileResponse:
         return FileResponse(_settings.web_dir / "index.html")
-
-
-@app.exception_handler(InvalidEmail)
-async def invalid_email_handler(_request: Request, exc: InvalidEmail) -> JSONResponse:
-    return JSONResponse(status_code=422, content={"detail": str(exc)})

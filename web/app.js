@@ -52,7 +52,6 @@ const DATA_LABEL = {
 const el = (id) => document.getElementById(id);
 const state = {
   results: [],
-  categories: [],
   activeCategories: new Set(),
   activeStatuses: new Set(),
   keyword: "",
@@ -192,7 +191,6 @@ function setMode(mode) {
 
 function applyMeta(meta, providers) {
   const ready = providers.filter((p) => p.ready).length;
-  el("meta-providers").textContent = `${ready}/${providers.length} 个模块就绪`;
 
   const quotaParts = [];
   if (meta.rate_limit.scans > 0) {
@@ -221,7 +219,6 @@ function applyMeta(meta, providers) {
 
   if (!meta.require_consent) el("consent-wrap").hidden = true;
 
-  state.categories = meta.categories;
   const wrap = el("category-chips");
   wrap.innerHTML = "";
   meta.categories.forEach((cat) => {

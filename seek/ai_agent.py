@@ -15,7 +15,7 @@ import json
 import logging
 import re
 from typing import Any, AsyncIterator, Awaitable, Callable
-from urllib.parse import quote_plus, urlparse
+from urllib.parse import urlparse
 
 import httpx
 

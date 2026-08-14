@@ -32,9 +32,6 @@ class Settings(BaseSettings):
     user_agent: str = DEFAULT_USER_AGENT
     proxy: str | None = None
 
-    # 是否加载 Holehe 的一百多个站点模块。默认关闭，改用本项目自己维护的规则。
-    # 想启用 Holehe 长尾站点：设为 true（需 pip install holehe）。
-    enable_holehe: bool = False
     # 被禁用的 holehe 模块清单文件（一行一个模块名，# 开头为注释）
     holehe_disabled_file: Path = PACKAGE_DIR / "data" / "holehe_disabled.txt"
     # 可靠模块白名单（一行一个模块名）

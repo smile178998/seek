@@ -27,6 +27,7 @@ extract:
   username: "entry.0.preferredUsername"
   display_name: "entry.0.displayName"
   profile_url: "entry.0.profileUrl"
+  avatar_url: "entry.0.thumbnailUrl"
   location: "entry.0.currentLocation"
   accounts: "entry.0.accounts[].shortname"
   urls: "entry.0.urls[].value"

@@ -273,6 +273,7 @@ def test_user_scanner_curated_modules_load_and_map_status():
     from seek.models import Status
     from seek.providers.user_scanner_bridge import (
         _map_status,
+        _normalize_profile_data,
         load_user_scanner_providers,
     )
 
@@ -285,6 +286,14 @@ def test_user_scanner_curated_modules_load_and_map_status():
     assert _map_status("AVAILABLE", "") is Status.NOT_REGISTERED
     assert _map_status("ERROR", "HTTP 429") is Status.RATE_LIMITED
     assert _map_status("ERROR", "unexpected response") is Status.ERROR
+    profile = _normalize_profile_data(
+        {"name": "Alice", "id": 42, "profile": "https://example.test/alice"},
+        {"avatar": "//cdn.example.test/alice.png"},
+    )
+    assert profile["display_name"] == "Alice"
+    assert profile["user_id"] == 42
+    assert profile["profile_url"] == "https://example.test/alice"
+    assert profile["avatar_url"] == "https://cdn.example.test/alice.png"
     assert providers[0].execution_timeout(SimpleNamespace(timeout=8.0)) >= 52.0
     print(f"[ok] User Scanner curated modules loaded ({len(providers)})")
 

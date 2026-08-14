@@ -37,6 +37,13 @@ const DATA_LABEL = {
   username: "用户名",
   display_name: "昵称",
   profile_url: "主页",
+  avatar_url: "头像",
+  user_id: "用户 ID",
+  name: "姓名",
+  streak: "连续学习天数",
+  has_plus: "付费会员",
+  has_google_id: "已绑定 Google",
+  has_facebook_id: "已绑定 Facebook",
   location: "位置",
   accounts: "关联账号",
   urls: "关联链接",
@@ -472,6 +479,25 @@ function rowNode(r) {
   badge.textContent = STATUS_LABEL[r.status] || r.status;
   row.appendChild(badge);
 
+  const avatarUrl = safeHttpUrl(r.data && r.data.avatar_url);
+  if (avatarUrl) {
+    const avatarLink = document.createElement("a");
+    avatarLink.className = "row-avatar-link";
+    avatarLink.href = avatarUrl;
+    avatarLink.target = "_blank";
+    avatarLink.rel = "noreferrer noopener";
+    avatarLink.title = "查看公开头像";
+    const avatar = document.createElement("img");
+    avatar.className = "row-avatar";
+    avatar.src = avatarUrl;
+    avatar.alt = `${r.title} 公开头像`;
+    avatar.loading = "lazy";
+    avatar.referrerPolicy = "no-referrer";
+    avatar.addEventListener("error", () => avatarLink.remove());
+    avatarLink.appendChild(avatar);
+    row.appendChild(avatarLink);
+  }
+
   const main = document.createElement("div");
   main.className = "row-main";
 
@@ -503,7 +529,7 @@ function rowNode(r) {
     main.appendChild(detail);
   }
 
-  const entries = Object.entries(r.data || {});
+  const entries = Object.entries(r.data || {}).filter(([k]) => k !== "avatar_url");
   if (entries.length) {
     const data = document.createElement("div");
     data.className = "row-data";
@@ -514,7 +540,7 @@ function rowNode(r) {
       key.textContent = (DATA_LABEL[k] || k) + ":";
       const val = document.createElement("span");
       val.className = "v";
-      val.textContent = Array.isArray(v) ? v.join(", ") : String(v);
+      appendDataValue(val, v);
       line.append(key, val);
       data.appendChild(line);
     });
@@ -530,6 +556,43 @@ function rowNode(r) {
   row.appendChild(meta);
 
   return row;
+}
+
+function safeHttpUrl(value) {
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value, window.location.href);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+function appendDataValue(container, value) {
+  if (Array.isArray(value)) {
+    container.textContent = value.join(", ");
+    return;
+  }
+  if (value && typeof value === "object") {
+    container.textContent = JSON.stringify(value, null, 2);
+    container.classList.add("is-json");
+    return;
+  }
+  const url = safeHttpUrl(value);
+  if (url) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noreferrer noopener";
+    link.textContent = value;
+    container.appendChild(link);
+    return;
+  }
+  if (typeof value === "boolean") {
+    container.textContent = value ? "是" : "否";
+    return;
+  }
+  container.textContent = value == null ? "-" : String(value);
 }
 
 function renderStatusFilters() {

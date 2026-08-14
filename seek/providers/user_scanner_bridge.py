@@ -73,6 +73,33 @@ def _map_status(status_name: str, reason: str) -> Status:
     return Status.ERROR
 
 
+def _normalize_profile_data(
+    extra: dict[str, Any] | None, media: dict[str, Any] | None
+) -> dict[str, Any]:
+    """Normalize public profile fields returned by upstream modules."""
+    data: dict[str, Any] = dict(extra or {})
+    aliases = {
+        "name": "display_name",
+        "id": "user_id",
+        "profile": "profile_url",
+        "profileUrl": "profile_url",
+    }
+    for source, target in aliases.items():
+        if source in data and target not in data:
+            data[target] = data.pop(source)
+
+    media_data = dict(media or {})
+    avatar = media_data.pop("avatar", None) or media_data.pop("profile_picture", None)
+    if isinstance(avatar, str) and avatar.strip() and avatar.strip().lower() != "no pfp":
+        avatar = avatar.strip()
+        if avatar.startswith("//"):
+            avatar = "https:" + avatar
+        data["avatar_url"] = avatar
+    if media_data:
+        data["media"] = media_data
+    return data
+
+
 class UserScannerProvider(Provider):
     def __init__(self, module: ModuleType, category: str, module_name: str) -> None:
         from user_scanner.core.helpers import get_site_name
@@ -121,9 +148,7 @@ class UserScannerProvider(Provider):
 
         reason = outcome.get_reason()
         status = _map_status(outcome.status.name, reason)
-        data: dict[str, Any] = dict(outcome.extra or {})
-        if outcome.media:
-            data["media"] = dict(outcome.media)
+        data = _normalize_profile_data(outcome.extra, outcome.media)
         result = self.make_result(
             status,
             elapsed_ms=timer.elapsed_ms,

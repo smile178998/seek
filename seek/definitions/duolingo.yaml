@@ -27,7 +27,13 @@ rules:
 
 extract:
   username: "users.0.username"
+  display_name: "users.0.name"
   user_id: "users.0.id"
+  avatar_url: "users.0.picture"
+  streak: "users.0.streak"
+  has_plus: "users.0.hasPlus"
+  has_google_id: "users.0.hasGoogleId"
+  has_facebook_id: "users.0.hasFacebookId"
 
 default: unknown
 default_detail: 接口返回格式与规则不匹配，可能已改版

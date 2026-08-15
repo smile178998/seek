@@ -126,8 +126,11 @@ async def meta(request: Request) -> dict:
 
 
 @app.get("/api/providers", response_model=list[ProviderInfo])
-async def providers(request: Request) -> list[ProviderInfo]:
-    return [p.info for p in request.app.state.providers]
+async def providers(
+    request: Request,
+    profile: str | None = Query(None, description="档位：reliable 或 full"),
+) -> list[ProviderInfo]:
+    return [p.info for p in providers_for(request, profile)]
 
 
 @app.post("/api/scan", response_model=ScanResponse)
@@ -150,6 +153,7 @@ async def scan_stream(
 ) -> StreamingResponse:
     settings: Settings = request.app.state.settings
     only_list, exclude_list = _split_csv(only), _split_csv(exclude)
+    resolved_profile = settings.normalize_profile(profile, kind="scan")
     providers = providers_for(request, profile)
 
     # EventSource 读不到 HTTP 错误响应体，所以校验失败也走事件下发
@@ -164,7 +168,10 @@ async def scan_stream(
         try:
             async with Engine(providers, settings) as engine:
                 total = len(filter_providers(engine.providers, only_list, exclude_list))
-                yield _sse("start", {"email": normalized, "total": total})
+                yield _sse(
+                    "start",
+                    {"email": normalized, "total": total, "profile": resolved_profile},
+                )
                 async for result in engine.stream(normalized, only_list, exclude_list):
                     if await request.is_disconnected():
                         log.info("客户端断开，终止扫描")

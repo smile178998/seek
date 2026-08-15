@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import html
 import importlib
 import logging
 from pathlib import Path
@@ -51,6 +52,13 @@ CATEGORY_MAP = {
     "women_health": "medical",
 }
 
+# A small number of upstream modules expose a validator whose function name
+# does not match the module name expected by user-scanner's generic engine.
+# Keep the compatibility mapping here rather than modifying site-packages.
+VALIDATOR_ALIASES = {
+    "sports/besoccer": "validate_okcats",
+}
+
 
 def user_scanner_available() -> bool:
     try:
@@ -61,13 +69,23 @@ def user_scanner_available() -> bool:
 
 
 def _map_status(status_name: str, reason: str) -> Status:
+    text = html.unescape(reason or "").lower()
+    unsupported_markers = (
+        "don't accept this email service",
+        "does not accept this email service",
+        "does not accept registrations from",
+        "does not support the sub-address probe",
+        "email service is not accepted",
+        "email delivery issues",
+    )
+    if any(marker in text for marker in unsupported_markers):
+        return Status.UNKNOWN
     if status_name == "TAKEN":
         return Status.REGISTERED
     if status_name == "AVAILABLE":
         return Status.NOT_REGISTERED
     if status_name == "SKIPPED":
         return Status.SKIPPED
-    text = reason.lower()
     if any(marker in text for marker in ("429", "403", "rate limit", "waf", "blocked")):
         return Status.RATE_LIMITED
     return Status.ERROR
@@ -105,6 +123,7 @@ class UserScannerProvider(Provider):
         from user_scanner.core.helpers import get_site_name
 
         self._module = module
+        self._entry = f"{category}/{module_name}"
         self.module_name = module_name
         super().__init__(
             ProviderInfo(
@@ -124,6 +143,10 @@ class UserScannerProvider(Provider):
         from user_scanner.core import engine as scanner_engine
 
         def run_isolated():
+            validator_name = VALIDATOR_ALIASES.get(self._entry)
+            if validator_name:
+                validator = getattr(self._module, validator_name)
+                return asyncio.run(validator(ctx.email))
             return asyncio.run(scanner_engine.check(self._module, ctx.email))
 
         with Timer() as timer:
@@ -146,7 +169,7 @@ class UserScannerProvider(Provider):
                     detail=f"User Scanner error: {type(exc).__name__}: {exc}",
                 )
 
-        reason = outcome.get_reason()
+        reason = html.unescape(outcome.get_reason() or "")
         status = _map_status(outcome.status.name, reason)
         data = _normalize_profile_data(outcome.extra, outcome.media)
         result = self.make_result(

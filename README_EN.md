@@ -31,7 +31,7 @@ Results are heuristic signals only (site changes, anti-bot controls, and network
 
 | Mode | Description |
 | --- | --- |
-| **Reliable (default)** | 130+ tested modules with thread isolation and high-concurrency scheduling |
+| **Reliable (default)** | 140+ tested modules with thread isolation and high-concurrency scheduling |
 | **Full** | Loads 50+ self-maintained rules under `seek/definitions/` (broader coverage; some may be unknown / rate-limited) |
 | **Holehe (optional)** | Full mode adds ~120 more modules (many may be broken or blocked) |
 

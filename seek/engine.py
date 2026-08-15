@@ -68,6 +68,7 @@ class Engine:
         """逐个产出结果，谁先返回就先产出。"""
         selected = filter_providers(self.providers, only, exclude)
         semaphore = asyncio.Semaphore(max(1, self.settings.concurrency))
+        category_semaphores = {"adult": asyncio.Semaphore(1)}
         ctx = CheckContext(email=email, client=self.client, timeout=self.settings.timeout)
         # 网络层已有单请求超时；仅留少量清理余量，避免慢模块拖住整批扫描。
         def detach(task: asyncio.Task[Result]) -> None:
@@ -82,30 +83,37 @@ class Engine:
 
             task.add_done_callback(consume)
 
+        async def execute(provider: Provider) -> Result:
+            try:
+                check_task = asyncio.create_task(provider.check(ctx))
+                done, _ = await asyncio.wait(
+                    {check_task}, timeout=provider.execution_timeout(ctx)
+                )
+                if not done:
+                    detach(check_task)
+                    return provider.make_result(Status.ERROR, detail="模块执行超时")
+                return await check_task
+            except asyncio.TimeoutError:  # 兼容模块内部主动抛出的超时
+                return provider.make_result(Status.ERROR, detail="模块执行超时")
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:  # 单个模块异常不影响整体
+                log.exception("模块 %s 执行失败", provider.name)
+                return provider.make_result(
+                    Status.ERROR, detail=f"模块异常: {type(exc).__name__}: {exc}"
+                )
+
         async def run_one(provider: Provider) -> Result:
             if not provider.info.ready:
                 return provider.make_result(
                     Status.SKIPPED, detail=provider.info.unready_reason or "模块未就绪"
                 )
             async with semaphore:
-                try:
-                    check_task = asyncio.create_task(provider.check(ctx))
-                    done, _ = await asyncio.wait(
-                        {check_task}, timeout=provider.execution_timeout(ctx)
-                    )
-                    if not done:
-                        detach(check_task)
-                        return provider.make_result(Status.ERROR, detail="模块执行超时")
-                    return await check_task
-                except asyncio.TimeoutError:  # 兼容模块内部主动抛出的超时
-                    return provider.make_result(Status.ERROR, detail="模块执行超时")
-                except asyncio.CancelledError:
-                    raise
-                except Exception as exc:  # 单个模块异常不影响整体
-                    log.exception("模块 %s 执行失败", provider.name)
-                    return provider.make_result(
-                        Status.ERROR, detail=f"模块异常: {type(exc).__name__}: {exc}"
-                    )
+                category_semaphore = category_semaphores.get(provider.info.category)
+                if category_semaphore is not None:
+                    async with category_semaphore:
+                        return await execute(provider)
+                return await execute(provider)
 
         async def run_pair(provider: Provider) -> tuple[Provider, Result]:
             return provider, await run_one(provider)
@@ -168,6 +176,8 @@ _STATUS_ORDER = {
 
 
 def _is_retryable_network_error(result: Result) -> bool:
+    if result.status is Status.RATE_LIMITED:
+        return True
     if result.status is not Status.ERROR:
         return False
     detail = (result.detail or "").lower()

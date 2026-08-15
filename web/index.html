@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>seek · 邮箱注册痕迹反查</title>
-  <link rel="stylesheet" href="/static/style.css?v=20260815-5" />
+  <title>Seek · 邮箱注册痕迹反查</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260815-6" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔎</text></svg>" />
 </head>
 <body>
@@ -14,7 +14,7 @@
 
   <header class="topbar">
     <div class="brand">
-      <span class="brand-mark">seek</span>
+      <span class="brand-mark">Seek</span>
       <span class="brand-sub">邮箱注册痕迹反查</span>
     </div>
     <div class="topbar-meta">
@@ -25,9 +25,10 @@
   <main class="wrap">
     <section class="panel search-panel">
       <div class="mode-row" id="mode-row">
-        <button type="button" class="mode-chip on" data-mode="scan">可靠扫描</button>
+        <button type="button" class="mode-chip on" data-mode="scan" data-profile="reliable">可靠扫描</button>
+        <button type="button" class="mode-chip" data-mode="scan" data-profile="full">扩展扫描</button>
         <button type="button" class="mode-chip" data-mode="ai" id="mode-ai">AI 可靠汇总</button>
-        <span id="ai-status" class="mode-hint">配置 SEEK_AI_API_KEY 后可用 · 默认可靠模式</span>
+        <span id="mode-status" class="mode-hint">可靠扫描：仅运行已验证站点，速度更快</span>
       </div>
 
       <div class="search-row">
@@ -101,12 +102,12 @@
       <ul>
         <li>本工具仅用于<strong>本人账号资产梳理</strong>与<strong>已授权的安全评估</strong>。未经授权针对他人查询可能违反《个人信息保护法》《网络安全法》及目标站点服务条款。</li>
         <li>结果仅为探测推断：站点改版、风控拦截、CDN 缓存都可能造成误报或漏报，<strong>不可作为结论性证据</strong>。</li>
-        <li>默认「可靠模式」只跑高可用模块；已注册为空通常表示未命中，不等于故障。完整覆盖可在 <code>.env</code> 设置 <code>SEEK_SCAN_PROFILE=full</code> / <code>SEEK_AI_PROFILE=full</code>。</li>
+        <li>「可靠扫描」只运行经过验证的高可用模块；「扩展扫描」会加入更多候选规则，但更慢，也更容易受到站点风控影响。已注册为空通常表示未命中，不等于故障。</li>
         <li>内置模块只使用站点<strong>官方公开提供</strong>的查询接口。如需扩展，请在 <code>seek/definitions/</code> 下自行添加规则，并自行确认合法性。</li>
       </ul>
     </section>
   </main>
 
-  <script src="/static/app.js?v=20260815-5"></script>
+  <script src="/static/app.js?v=20260815-6"></script>
 </body>
 </html>

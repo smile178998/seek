@@ -282,8 +282,18 @@ def test_user_scanner_curated_modules_load_and_map_status():
     assert len(providers) >= 100
     assert "userscanner_dropbox" in names
     assert "userscanner_huggingface" in names
+    assert "userscanner_pornhub" in names
+    assert "userscanner_xvideos" in names
+    assert "userscanner_made_porn" not in names
+    assert "userscanner_babestation" not in names
     assert _map_status("TAKEN", "") is Status.REGISTERED
     assert _map_status("AVAILABLE", "") is Status.NOT_REGISTERED
+    assert _map_status(
+        "AVAILABLE", "Sorry, we don&#039;t accept this email service."
+    ) is Status.UNKNOWN
+    assert _map_status(
+        "ERROR", "Pornhub does not accept registrations from 'example.com'"
+    ) is Status.UNKNOWN
     assert _map_status("ERROR", "HTTP 429") is Status.RATE_LIMITED
     assert _map_status("ERROR", "unexpected response") is Status.ERROR
     profile = _normalize_profile_data(
@@ -296,6 +306,12 @@ def test_user_scanner_curated_modules_load_and_map_status():
     assert profile["avatar_url"] == "https://cdn.example.test/alice.png"
     assert providers[0].execution_timeout(SimpleNamespace(timeout=8.0)) >= 52.0
     print(f"[ok] User Scanner curated modules loaded ({len(providers)})")
+
+
+def test_user_scanner_validator_aliases_cover_known_upstream_mismatch():
+    from seek.providers.user_scanner_bridge import VALIDATOR_ALIASES
+
+    assert VALIDATOR_ALIASES["sports/besoccer"] == "validate_okcats"
 
 
 def test_transient_network_error_is_retried_once():

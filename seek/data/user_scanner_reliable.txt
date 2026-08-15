@@ -87,6 +87,12 @@ women_health/premom
 
 # Added after two-domain negative-control checks on 2026-08-15.
 # Password-reset / OTP-sending modules are intentionally excluded.
+adult/faproulette
+adult/pornhub
+adult/thegay
+adult/xnxx
+adult/xvideos
+adult/youporn
 creator/adobe
 dev/envato
 dev/medium
@@ -103,4 +109,5 @@ shopping/vivino
 social/instagram
 social/pinterest
 social/tumblr
+sports/besoccer
 travel/komoot

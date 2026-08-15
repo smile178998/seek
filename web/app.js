@@ -65,7 +65,9 @@ const state = {
   email: "",
   total: 0,
   mode: "scan", // scan | ai
+  scanProfile: "reliable", // reliable | full
   aiConfigured: false,
+  aiMeta: null,
 };
 
 /* ---------------- 初始化 ---------------- */
@@ -82,7 +84,7 @@ async function init() {
   el("export-json").addEventListener("click", exportJson);
   el("export-csv").addEventListener("click", exportCsv);
   document.querySelectorAll(".mode-chip").forEach((chip) => {
-    chip.addEventListener("click", () => setMode(chip.dataset.mode));
+    chip.addEventListener("click", () => setMode(chip.dataset.mode, chip.dataset.profile));
   });
 
   try {
@@ -103,32 +105,48 @@ function safeStart() {
   }
 }
 
-function setMode(mode) {
+function setMode(mode, profile = null) {
   if (mode === "ai" && !state.aiConfigured) {
     toast("请先在 .env 配置 SEEK_AI_API_KEY 并重启服务", true);
     return;
   }
   state.mode = mode;
+  if (mode === "scan" && profile) state.scanProfile = profile;
   document.querySelectorAll(".mode-chip").forEach((c) => {
-    c.classList.toggle("on", c.dataset.mode === mode);
+    const selected = c.dataset.mode === mode &&
+      (mode === "ai" || c.dataset.profile === state.scanProfile);
+    c.classList.toggle("on", selected);
   });
   el("run").querySelector(".btn-label").textContent =
-    mode === "ai" ? "开始 AI 汇总" : "开始查询";
+    mode === "ai" ? "开始 AI 汇总" :
+      state.scanProfile === "full" ? "开始扩展查询" : "开始查询";
+  updateModeHint();
 }
 
 function applyMeta(meta) {
   state.aiConfigured = !!(meta.ai && meta.ai.configured);
+  state.aiMeta = meta.ai || null;
   const aiBtn = el("mode-ai");
-  const aiHint = el("ai-status");
   const aiProfile = (meta.ai && meta.ai.profile) || meta.ai_profile || "reliable";
   if (state.aiConfigured) {
     aiBtn.disabled = false;
-    aiHint.textContent = `AI 已就绪 · ${meta.ai.model || ""} · ${aiProfile === "full" ? "完整" : "可靠"}档`;
   } else {
     aiBtn.disabled = true;
-    aiHint.textContent = "配置 SEEK_AI_API_KEY 后可用 · 默认可靠模式";
   }
+  state.aiMeta = { ...(meta.ai || {}), profile: aiProfile };
+  updateModeHint();
+}
 
+function updateModeHint() {
+  const hint = el("mode-status");
+  if (state.mode === "ai") {
+    const meta = state.aiMeta || {};
+    hint.textContent = `AI 已就绪 · ${meta.model || ""} · ${meta.profile === "full" ? "扩展" : "可靠"}档`;
+    return;
+  }
+  hint.textContent = state.scanProfile === "full"
+    ? "扩展扫描：覆盖更多候选站点，耗时和受限结果会增加"
+    : "可靠扫描：仅运行已验证站点，速度更快";
 }
 
 /* ---------------- 扫描 ---------------- */
@@ -165,7 +183,7 @@ function start() {
   const params = new URLSearchParams({
     email,
     consent: "true",
-    profile: "reliable",
+    profile: state.scanProfile,
   });
   const source = new EventSource(`/api/scan/stream?${params.toString()}`);
   state.source = source;
@@ -173,7 +191,8 @@ function start() {
   source.addEventListener("start", (e) => {
     const data = JSON.parse(e.data);
     state.total = data.total;
-    el("progress-text").textContent = `正在检测 ${data.email}`;
+    const profileLabel = (data.profile || state.scanProfile) === "full" ? "扩展扫描" : "可靠扫描";
+    el("progress-text").textContent = `${profileLabel} · 正在检测 ${data.email}`;
     el("progress-count").textContent = `0 / ${data.total}`;
   });
 
@@ -403,7 +422,8 @@ function stop() {
 
 function setRunning(running) {
   el("run").disabled = running;
-  const idle = state.mode === "ai" ? "开始 AI 汇总" : "开始查询";
+  const idle = state.mode === "ai" ? "开始 AI 汇总" :
+    state.scanProfile === "full" ? "开始扩展查询" : "开始查询";
   el("run").querySelector(".btn-label").textContent = running ? "检测中…" : idle;
   el("stop").hidden = !running;
 }
@@ -657,7 +677,12 @@ function exportJson() {
   if (!state.results.length) return toast("暂无结果可导出", true);
   download(
     `seek_${slug()}.json`,
-    JSON.stringify({ email: state.email, generated_at: new Date().toISOString(), results: state.results }, null, 2),
+    JSON.stringify({
+      email: state.email,
+      profile: state.mode === "ai" ? "ai" : state.scanProfile,
+      generated_at: new Date().toISOString(),
+      results: state.results,
+    }, null, 2),
     "application/json"
   );
 }

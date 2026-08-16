@@ -1,0 +1,32 @@
+name: appinn_forum
+title: 小众软件社区
+category: forum
+homepage: https://meta.appinn.net
+description: 使用论坛注册页调用的 Discourse 公开邮箱可用性校验接口
+notes: 只读校验，不发送验证码、激活邮件或找回邮件；2026-08 使用 Gmail 与 Outlook 随机邮箱双样本验证
+
+request:
+  method: GET
+  url: "https://meta.appinn.net/u/check_email.json"
+  headers:
+    Accept: "application/json"
+    Referer: "https://meta.appinn.net/signup"
+  params:
+    email: "{email}"
+
+rules:
+  - registered_if:
+      status_in: [200]
+      body_matches: '(?i)(already.{0,30}taken|has already been taken|已被使用|已被占用|已经被使用)'
+    detail: Discourse 注册校验确认该邮箱已被占用
+  - not_registered_if:
+      status_in: [200]
+      json_path_equals:
+        path: "success"
+        value: "OK"
+    detail: 论坛注册校验确认该邮箱当前可用
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown
+default_detail: 论坛未返回明确的邮箱占用状态

@@ -67,6 +67,24 @@ python -m seek.cli scan me@example.com -y --json
 
 ---
 
+## 生产环境安全部署
+
+默认配置只监听 `127.0.0.1`，适合本机使用。公网部署时，请在 Caddy / Nginx / Cloudflare 等反向代理上终止 HTTPS，并配置：
+
+```bash
+SEEK_ALLOWED_HOSTS=seek.example.com
+SEEK_DOCS_ENABLED=false
+SEEK_TRUST_PROXY_HEADERS=true
+SEEK_TRUSTED_PROXIES=127.0.0.1/32,::1/128
+SEEK_FORCE_HTTPS=true
+SEEK_HSTS_ENABLED=true
+```
+
+- `SEEK_TRUSTED_PROXIES` 必须写实际反向代理的 IP/CIDR，不要设置为全网段。
+- 只有在 HTTPS 已稳定工作后才开启 HSTS；错误开启会导致浏览器拒绝 HTTP。
+- 生产环境建议使用 Redis/网关级限流取代单进程内存限流，并定期更新依赖。
+- `.env` 中的 API Key 不要提交到 Git；建议使用部署平台的密钥管理功能。
+
 ## AI 可靠汇总（可选）
 
 先跑检测工具，再用大模型把证据汇总成报告（不是让 AI 瞎猜）。

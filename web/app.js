@@ -320,6 +320,64 @@ function updateModeHint() {
 }
 
 /* ---------------- 扫描 ---------------- */
+function createPostEventStream(url, payload) {
+  const controller = new AbortController();
+  const listeners = new Map();
+  let closed = false;
+  const source = {
+    addEventListener(name, listener) {
+      const group = listeners.get(name) || [];
+      group.push(listener);
+      listeners.set(name, group);
+    },
+    close() {
+      closed = true;
+      controller.abort();
+    },
+  };
+  const dispatch = (name, data = "") => {
+    for (const listener of listeners.get(name) || []) listener({ data });
+  };
+
+  queueMicrotask(async () => {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+        body: JSON.stringify(payload),
+        credentials: "same-origin",
+        cache: "no-store",
+        referrerPolicy: "no-referrer",
+        signal: controller.signal,
+      });
+      if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (!closed) {
+        const { value, done } = await reader.read();
+        buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+        const frames = buffer.split(/\r?\n\r?\n/);
+        buffer = frames.pop() || "";
+        for (const frame of frames) {
+          let event = "message";
+          const data = [];
+          for (const line of frame.split(/\r?\n/)) {
+            if (line.startsWith("event:")) event = line.slice(6).trim();
+            if (line.startsWith("data:")) data.push(line.slice(5).trimStart());
+          }
+          dispatch(event, data.join("\n"));
+        }
+        if (done) break;
+      }
+      if (!closed) dispatch("error");
+    } catch (error) {
+      if (!closed && error.name !== "AbortError") dispatch("error");
+    }
+  });
+  return source;
+}
+
 function start() {
   if (state.source) return;
 
@@ -350,12 +408,13 @@ function start() {
     return;
   }
 
-  const params = new URLSearchParams({
+  const source = createPostEventStream("/api/scan/stream", {
     email,
-    consent: "true",
+    consent: true,
     profile: state.scanProfile,
+    only: [],
+    exclude: [],
   });
-  const source = new EventSource(`/api/scan/stream?${params.toString()}`);
   state.source = source;
 
   source.addEventListener("start", (e) => {
@@ -402,8 +461,11 @@ function start() {
 }
 
 function startAi(email) {
-  const params = new URLSearchParams({ email, consent: "true", lang: state.lang });
-  const source = new EventSource(`/api/ai/investigate?${params.toString()}`);
+  const source = createPostEventStream("/api/ai/investigate", {
+    email,
+    consent: true,
+    lang: state.lang,
+  });
   state.source = source;
   const logBox = el("ai-log");
   logBox.hidden = false;
@@ -420,7 +482,7 @@ function startAi(email) {
     const profileLabel = d.profile === "full" ? t("extendedTier") : t("reliableTier");
     el("progress-text").textContent = `${profileLabel} · ${t("aiAggregating")} · ${d.model}`;
     el("progress-count").textContent = "…";
-    appendLog(`${t("model")} ${d.model} @ ${d.base_url}`);
+    appendLog(`${t("model")} ${d.model}`);
     appendLog(`${t("tier")}: ${profileLabel} (SEEK_AI_PROFILE=${d.profile || "reliable"})`);
   });
 

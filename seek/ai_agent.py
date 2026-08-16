@@ -11,9 +11,11 @@
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
 import logging
 import re
+import socket
 from typing import Any, AsyncIterator, Awaitable, Callable
 from urllib.parse import urlparse
 
@@ -185,7 +187,6 @@ class AIInvestigator:
         await self._emit("ai_start", {
             "email": self.email,
             "model": cfg["model"],
-            "base_url": cfg["base_url"],
             "mode": "aggregate_then_summarize",
             "profile": profile,
         })
@@ -277,7 +278,7 @@ class AIInvestigator:
             json=payload,
         )
         if resp.status_code >= 400:
-            raise RuntimeError(f"AI API 错误 HTTP {resp.status_code}: {resp.text[:400]}")
+            raise RuntimeError(f"AI API returned HTTP {resp.status_code}")
         return resp.json()
 
     async def _dispatch(
@@ -349,19 +350,91 @@ def _preview(result: Any, limit: int = 280) -> str:
     return text if len(text) <= limit else text[:limit] + "…"
 
 
+async def _validate_public_url(url: str) -> tuple[bool, str]:
+    """Fail closed unless every resolved address is a public Internet address."""
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        return False, "Invalid URL"
+    if parsed.username or parsed.password:
+        return False, "Credentials in URLs are not allowed"
+    try:
+        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    except ValueError:
+        return False, "Invalid port"
+    if port not in {80, 443}:
+        return False, "Only ports 80 and 443 are allowed"
+
+    hostname = parsed.hostname.rstrip(".").lower()
+    if (
+        hostname == "localhost"
+        or hostname.endswith((".localhost", ".local", ".internal", ".home"))
+        or hostname == "metadata.google.internal"
+    ):
+        return False, "Local or internal destinations are not allowed"
+
+    try:
+        literal = ipaddress.ip_address(hostname)
+        addresses = {literal}
+    except ValueError:
+        try:
+            loop = asyncio.get_running_loop()
+            records = await loop.getaddrinfo(
+                hostname, port, type=socket.SOCK_STREAM
+            )
+            addresses = {ipaddress.ip_address(record[4][0]) for record in records}
+        except (OSError, ValueError):
+            return False, "Destination could not be safely resolved"
+
+    if not addresses or any(not address.is_global for address in addresses):
+        return False, "Private, local, and reserved destinations are not allowed"
+    return True, ""
+
+
+async def _download_limited(http: httpx.AsyncClient, url: str) -> httpx.Response:
+    async with http.stream(
+        "GET",
+        url,
+        headers={"User-Agent": "Mozilla/5.0 (compatible; seek-osint/0.1)"},
+        follow_redirects=False,
+        timeout=15.0,
+    ) as response:
+        declared = response.headers.get("content-length")
+        if declared and int(declared) > 262_144:
+            raise ValueError("Response is too large")
+        body = bytearray()
+        async for chunk in response.aiter_bytes():
+            body.extend(chunk)
+            if len(body) > 262_144:
+                raise ValueError("Response is too large")
+        return httpx.Response(
+            response.status_code,
+            headers=response.headers,
+            content=bytes(body),
+            request=response.request,
+        )
+
+
 async def _fetch_snippet(http: httpx.AsyncClient, url: str) -> dict[str, Any]:
+    allowed, reason = await _validate_public_url(url)
+    if not allowed:
+        return {"error": reason}
     parsed = urlparse(url)
     if parsed.scheme not in ("http", "https") or not parsed.netloc:
         return {"error": "非法 URL"}
     try:
-        resp = await http.get(
-            url,
-            headers={"User-Agent": "Mozilla/5.0 (compatible; seek-osint/0.1)"},
-            follow_redirects=True,
-            timeout=15.0,
-        )
-    except httpx.HTTPError as exc:
-        return {"error": str(exc)}
+        resp = await _download_limited(http, url)
+    except (httpx.HTTPError, ValueError):
+        return {"error": "The public page could not be fetched safely"}
+    if resp.is_redirect:
+        return {"error": "Redirects are not followed for security reasons"}
+    if len(resp.content) > 262_144:
+        return {"error": "Response is too large"}
+    content_type = resp.headers.get("content-type", "").lower()
+    if content_type and not any(
+        allowed_type in content_type
+        for allowed_type in ("text/", "application/json", "application/xml", "+json")
+    ):
+        return {"error": "Unsupported response type"}
     text = re.sub(r"(?is)<script.*?>.*?</script>", " ", resp.text)
     text = re.sub(r"(?is)<style.*?>.*?</style>", " ", text)
     text = re.sub(r"(?s)<[^>]+>", " ", text)
@@ -388,7 +461,7 @@ async def investigate_stream(
             await agent.run()
         except Exception as exc:
             log.exception("AI 调查失败")
-            await queue.put(("error", {"message": f"{type(exc).__name__}: {exc}"}))
+            await queue.put(("error", {"message": "AI investigation failed; please try again later"}))
         finally:
             await queue.put(None)
 

@@ -157,11 +157,13 @@ class AIInvestigator:
         providers: list[Provider],
         settings: Settings,
         emit: EventSink | None = None,
+        language: str = "zh",
     ) -> None:
         self.email = email
         self.providers = providers  # 保留兼容；实际全量跑 aggregators
         self.settings = settings
         self.emit = emit
+        self.language = "en" if language == "en" else "zh"
         self._report: dict[str, Any] | None = None
         self._bundle: dict[str, Any] | None = None
 
@@ -194,8 +196,15 @@ class AIInvestigator:
         )
         evidence = bundle_for_llm(self._bundle)
 
+        system_prompt = SYSTEM_PROMPT
+        if self.language == "en":
+            system_prompt += (
+                "\nWrite every user-facing field in English, including summary, evidence, "
+                "unchecked_or_failed, and next_steps. Keep site brand names unchanged."
+            )
+
         messages: list[dict[str, Any]] = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {
                 "role": "user",
                 "content": (
@@ -301,19 +310,31 @@ class AIInvestigator:
             for acc in g["profile"]["accounts"]:
                 likely.append({
                     "site": str(acc),
-                    "evidence": "Gravatar 资料中关联的账号",
+                    "evidence": (
+                        "Account linked from the public Gravatar profile"
+                        if self.language == "en"
+                        else "Gravatar 资料中关联的账号"
+                    ),
                     "source": "gravatar",
                 })
         for hit in ((bundle.get("backends") or {}).get("web_search") or {}).get("results") or [][:8]:
             likely.append({
                 "site": hit.get("title") or hit.get("url"),
-                "evidence": hit.get("snippet") or "公开网页搜索命中",
+                "evidence": hit.get("snippet") or (
+                    "Matched by a public web search"
+                    if self.language == "en"
+                    else "公开网页搜索命中"
+                ),
                 "url": hit.get("url") or "",
                 "source": "web_search",
             })
         return enrich_report({
             "email": self.email,
-            "summary": "AI 未按时提交报告，已根据可靠检测结果自动汇总。",
+            "summary": (
+                "The AI did not submit a report in time. This fallback was generated from the verified scan results."
+                if self.language == "en"
+                else "AI 未按时提交报告，已根据可靠检测结果自动汇总。"
+            ),
             "confirmed": [],
             "likely": likely,
             "intel": [],
@@ -352,6 +373,7 @@ async def investigate_stream(
     email: str,
     providers: list[Provider],
     settings: Settings,
+    language: str = "zh",
 ) -> AsyncIterator[str]:
     queue: asyncio.Queue[tuple[str, dict] | None] = asyncio.Queue()
 
@@ -360,7 +382,9 @@ async def investigate_stream(
 
     async def runner() -> None:
         try:
-            agent = AIInvestigator(email, providers, settings, emit=emit)
+            agent = AIInvestigator(
+                email, providers, settings, emit=emit, language=language
+            )
             await agent.run()
         except Exception as exc:
             log.exception("AI 调查失败")

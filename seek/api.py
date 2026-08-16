@@ -197,6 +197,7 @@ async def ai_investigate(
     request: Request,
     email: str = Query(..., description="要调查的邮箱"),
     consent: bool = Query(False, description="是否已确认授权声明"),
+    lang: str = Query("zh", description="报告语言：zh 或 en"),
 ) -> StreamingResponse:
     """AI 智能体：用大模型 API Key 调度扫描 + 公开搜索，汇总可能注册的站点。"""
     if not ai_configured():
@@ -209,11 +210,12 @@ async def ai_investigate(
         return _sse_error_response(str(exc.detail))
 
     settings: Settings = request.app.state.settings
+    language = "en" if lang.lower() == "en" else "zh"
 
     async def event_stream() -> AsyncIterator[str]:
         try:
             async for chunk in investigate_stream(
-                normalized, request.app.state.providers, settings
+                normalized, request.app.state.providers, settings, language=language
             ):
                 if await request.is_disconnected():
                     return

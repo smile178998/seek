@@ -85,6 +85,13 @@ body {
 .pill-muted { color: #6b7285; }
 .pill-link { color: var(--accent); text-decoration: none; }
 .pill-link:hover { border-color: var(--accent); }
+.language-toggle {
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+  background: rgba(255, 255, 255, 0.025);
+}
+.language-toggle:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ---------- 布局 ---------- */
 .wrap {

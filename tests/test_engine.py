@@ -404,6 +404,51 @@ def test_chinese_site_rules_map_only_explicit_signals():
     print("[ok] CSDN / CNBlogs / Gitee explicit status mapping")
 
 
+def test_chinese_forum_definitions_use_read_only_discourse_checks():
+    import yaml
+
+    definitions = Path(__file__).resolve().parents[1] / "seek" / "definitions"
+    expected = {
+        "appinn_forum": "https://meta.appinn.net/u/check_email.json",
+        "fit2cloud_forum": "https://bbs.fit2cloud.com/u/check_email.json",
+        "openeuler_forum": "https://forum.openeuler.org/u/check_email.json",
+    }
+    for name, url in expected.items():
+        spec = yaml.safe_load(
+            (definitions / f"{name}.yaml").read_text(encoding="utf-8")
+        )
+        assert spec["request"]["method"] == "GET"
+        assert spec["request"]["url"] == url
+        assert "prepare" not in spec
+
+        result = run_with_spec(
+            spec, lambda _: httpx.Response(200, json={"success": "OK"})
+        )[0]
+        assert result.status is Status.NOT_REGISTERED
+
+        result = run_with_spec(
+            spec,
+            lambda _: httpx.Response(
+                200,
+                json={
+                    "success": "failed",
+                    "errors": ["Primary email has already been taken"],
+                },
+            ),
+        )[0]
+        assert result.status is Status.REGISTERED
+
+        result = run_with_spec(
+            spec,
+            lambda _: httpx.Response(
+                200, json={"success": "failed", "errors": ["Email is invalid"]}
+            ),
+        )[0]
+        assert result.status is Status.UNKNOWN
+
+    print("[ok] Chinese Discourse forums use read-only explicit email signals")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):

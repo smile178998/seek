@@ -25,6 +25,9 @@ plurk
 cnblogs
 csdn
 gitee
+appinn_forum
+fit2cloud_forum
+openeuler_forum
 protonmail
 wattpad
 

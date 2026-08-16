@@ -35,7 +35,7 @@ Results are heuristic signals only (site changes, anti-bot controls, and network
 | **Full** | Loads 50+ self-maintained rules under `seek/definitions/` (broader coverage; some may be unknown / rate-limited) |
 | **Holehe (optional)** | Full mode adds ~120 more modules (many may be broken or blocked) |
 
-Chinese coverage includes **CSDN, CNBlogs, Gitee, HelloChinese, Global Times, and MeetYou**. Phone-only or mandatory-CAPTCHA services are not presented as email-account checks.
+Chinese coverage includes **CSDN, CNBlogs, Gitee, Appinn Community, FIT2CLOUD Community, the openEuler Forum, HelloChinese, Global Times, MeetYou, and Wondershare**. Phone-only or mandatory-CAPTCHA services are not presented as email-account checks.
 
 No tool can guarantee “every website worldwide, always working.” `unknown` / failures are common and do **not** mean the app is broken.
 

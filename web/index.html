@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Seek · 邮箱注册痕迹反查</title>
+  <title>Seek · Email registration footprint lookup</title>
   <link rel="stylesheet" href="/static/style.css?v=20260815-6" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔎</text></svg>" />
 </head>
@@ -15,20 +15,24 @@
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark">Seek</span>
-      <span class="brand-sub">邮箱注册痕迹反查</span>
+      <span class="brand-sub">Email registration footprint lookup</span>
     </div>
     <div class="topbar-meta">
-      <a class="pill pill-link" href="/docs" target="_blank" rel="noreferrer">API 文档</a>
+      <a class="pill pill-link" href="/docs" target="_blank" rel="noreferrer">API Docs</a>
+      <div class="lang-picker">
+        <button id="btn-lang" class="pill" aria-haspopup="true" aria-expanded="false">Language</button>
+        <ul id="lang-menu" class="lang-menu" hidden></ul>
+      </div>
     </div>
   </header>
 
   <main class="wrap">
     <section class="panel search-panel">
       <div class="mode-row" id="mode-row">
-        <button type="button" class="mode-chip on" data-mode="scan" data-profile="reliable">可靠扫描</button>
-        <button type="button" class="mode-chip" data-mode="scan" data-profile="full">扩展扫描</button>
-        <button type="button" class="mode-chip" data-mode="ai" id="mode-ai">AI 可靠汇总</button>
-        <span id="mode-status" class="mode-hint">可靠扫描：仅运行已验证站点，速度更快</span>
+        <button type="button" class="mode-chip on" data-mode="scan" data-profile="reliable">Reliable scan</button>
+        <button type="button" class="mode-chip" data-mode="scan" data-profile="full">Extended scan</button>
+        <button type="button" class="mode-chip" data-mode="ai" id="mode-ai">AI summary</button>
+        <span id="mode-status" class="mode-hint">Reliable: only verified modules, faster</span>
       </div>
 
       <div class="search-row">
@@ -37,20 +41,20 @@
             <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.6"/>
             <path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6"/>
           </svg>
-          <input id="email" type="email" placeholder="somebody@example.com" autocomplete="off"
-                 spellcheck="false" />
+             <input id="email" type="email" placeholder="somebody@example.com" autocomplete="off"
+               spellcheck="false" />
         </div>
         <button id="run" class="btn btn-primary">
-          <span class="btn-label">开始查询</span>
+          <span class="btn-label">Start scan</span>
         </button>
-        <button id="stop" class="btn btn-ghost" hidden>停止</button>
+        <button id="stop" class="btn btn-ghost" hidden>Stop</button>
       </div>
 
     </section>
 
     <section id="progress-panel" class="panel progress-panel" hidden>
       <div class="progress-head">
-        <span id="progress-text">准备中…</span>
+        <span id="progress-text">Ready…</span>
         <span id="progress-count" class="mono">0 / 0</span>
       </div>
       <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
@@ -59,24 +63,24 @@
     <section id="stats" class="stats" hidden></section>
 
     <section id="ai-report-panel" class="panel ai-report" hidden>
-      <h3>AI 汇总报告</h3>
+      <h3 id="ai-report-title">AI Summary Report</h3>
       <div id="ai-stats" class="ai-stats" hidden></div>
       <p id="ai-summary" class="ai-summary"></p>
       <div class="ai-cols">
         <div>
-          <h4>已确认注册</h4>
+          <h4>Confirmed Registered</h4>
           <ul id="ai-confirmed"></ul>
         </div>
         <div>
-          <h4>域名 / 邮箱情报</h4>
+          <h4>Domain / Email Intel</h4>
           <ul id="ai-intel"></ul>
         </div>
         <div>
-          <h4>明确未注册</h4>
+          <h4>Confirmed Not Registered</h4>
           <ul id="ai-not-registered"></ul>
         </div>
         <div>
-          <h4>疑似线索</h4>
+          <h4>Likely Leads</h4>
           <ul id="ai-likely"></ul>
         </div>
       </div>
@@ -88,22 +92,22 @@
       <div class="results-toolbar">
         <div id="status-filters" class="chip-row"></div>
         <div class="toolbar-right">
-          <input id="keyword" class="mini-input" type="search" placeholder="过滤站点…" />
-          <button id="export-json" class="btn btn-mini">导出 JSON</button>
-          <button id="export-csv" class="btn btn-mini">导出 CSV</button>
+          <input id="keyword" class="mini-input" type="search" placeholder="Filter sites…" />
+          <button id="export-json" class="btn btn-mini">Export JSON</button>
+          <button id="export-csv" class="btn btn-mini">Export CSV</button>
         </div>
       </div>
       <div id="results" class="results"></div>
-      <div id="empty" class="empty" hidden>没有符合当前筛选条件的结果</div>
+      <div id="empty" class="empty" hidden>No results matching filters</div>
     </section>
 
     <section class="panel notice">
-      <h3>使用须知</h3>
+      <h3 id="notice-title">Usage notes</h3>
       <ul>
-        <li>本工具仅用于<strong>本人账号资产梳理</strong>与<strong>已授权的安全评估</strong>。未经授权针对他人查询可能违反《个人信息保护法》《网络安全法》及目标站点服务条款。</li>
-        <li>结果仅为探测推断：站点改版、风控拦截、CDN 缓存都可能造成误报或漏报，<strong>不可作为结论性证据</strong>。</li>
-        <li>「可靠扫描」只运行经过验证的高可用模块；「扩展扫描」会加入更多候选规则，但更慢，也更容易受到站点风控影响。已注册为空通常表示未命中，不等于故障。</li>
-        <li>内置模块只使用站点<strong>官方公开提供</strong>的查询接口。如需扩展，请在 <code>seek/definitions/</code> 下自行添加规则，并自行确认合法性。</li>
+        <li id="notice-1">This tool is for personal asset review and authorized assessments only. Unauthorized queries targeting others may violate privacy and local laws.</li>
+        <li id="notice-2">Results are inference: site changes, rate-limiting, and CDN caches may cause false positives or negatives; not conclusive evidence.</li>
+        <li id="notice-3">"Reliable scan" runs verified high-availability modules; "Extended scan" includes more candidate checks, may be slower and more likely to be rate-limited.</li>
+        <li id="notice-4">Built-in modules only use public site interfaces. To extend, add definitions under <code>seek/definitions/</code> and verify legality yourself.</li>
       </ul>
     </section>
   </main>

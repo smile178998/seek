@@ -173,6 +173,8 @@ async def run_gravatar(
     await _emit(emit, "backend_start", {"name": "gravatar", "modules": 1})
     sha = _digest_sha256(email)
     headers = {"User-Agent": settings.user_agent, "Accept": "application/json"}
+    if getattr(settings, "_accept_language_override", None):
+        headers["Accept-Language"] = getattr(settings, "_accept_language_override")
     result: dict[str, Any] = {
         "source": "gravatar",
         "registered": False,
@@ -250,11 +252,14 @@ async def run_web_searches(
         f'"{email}" site:github.com OR site:twitter.com OR site:linkedin.com',
     ]
     all_results: list[dict[str, Any]] = []
+    web_headers = {"User-Agent": "Mozilla/5.0 (compatible; seek-osint/0.1)"}
+    if getattr(settings, "_accept_language_override", None):
+        web_headers["Accept-Language"] = getattr(settings, "_accept_language_override")
     async with httpx.AsyncClient(
         timeout=20.0,
         verify=build_ssl_verify(settings),
         proxy=settings.proxy or None,
-        headers={"User-Agent": "Mozilla/5.0 (compatible; seek-osint/0.1)"},
+        headers=web_headers,
         follow_redirects=True,
     ) as client:
         for q in queries:

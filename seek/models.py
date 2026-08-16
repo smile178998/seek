@@ -90,6 +90,7 @@ class ScanRequest(BaseModel):
     only: list[str] = Field(default_factory=list)
     exclude: list[str] = Field(default_factory=list)
     profile: Literal["reliable", "full"] | None = None
+    accept_language: str | None = None
 
 
 class ScanResponse(BaseModel):

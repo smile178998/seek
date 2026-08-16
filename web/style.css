@@ -85,6 +85,34 @@ body {
 .pill-muted { color: #6b7285; }
 .pill-link { color: var(--accent); text-decoration: none; }
 .pill-link:hover { border-color: var(--accent); }
+button.pill { cursor: pointer; }
+.pill-secondary { background: rgba(91, 140, 255, 0.14); border-color: var(--accent); color: #cddcff; }
+
+/* Language picker */
+.lang-picker { position: relative; display: inline-block; }
+.lang-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  min-width: 160px;
+  padding: 6px 6px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  z-index: 20;
+}
+.lang-menu li {
+  list-style: none;
+  margin: 0;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 13px;
+  border-radius: 6px;
+}
+.lang-menu li:hover { background: rgba(255,255,255,0.03); }
+.lang-menu .selected { background: rgba(91,140,255,0.12); color: #cddcff; }
 
 /* ---------- 布局 ---------- */
 .wrap {

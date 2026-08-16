@@ -23,19 +23,32 @@ class Engine:
         providers: Sequence[Provider] | None = None,
         settings: Settings | None = None,
         transport: httpx.AsyncBaseTransport | None = None,
+        accept_language: str | None = None,
     ) -> None:
         self.settings = settings or get_settings()
         self.providers = list(providers) if providers is not None else load_providers(self.settings)
         self._transport = transport  # 仅用于测试时注入假响应
         self._client: httpx.AsyncClient | None = None
+        self.accept_language = accept_language
 
     # ---------- 生命周期 ----------
     async def __aenter__(self) -> "Engine":
+        headers = {
+            "User-Agent": self.settings.user_agent,
+        }
+        # Prefer explicit accept_language passed to Engine, otherwise allow
+        # a temporary override on settings (used by AI investigator), then
+        # fall back to the default zh-CN... header.
+        effective_lang = self.accept_language
+        if effective_lang is None:
+            effective_lang = getattr(self.settings, "_accept_language_override", None)
+        if effective_lang is None:
+            headers["Accept-Language"] = "zh-CN,zh;q=0.9,en;q=0.8"
+        else:
+            headers["Accept-Language"] = effective_lang
+
         self._client = httpx.AsyncClient(
-            headers={
-                "User-Agent": self.settings.user_agent,
-                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            },
+            headers=headers,
             proxy=self.settings.proxy or None,
             timeout=self.settings.timeout,
             limits=httpx.Limits(

@@ -150,6 +150,7 @@ async def scan_stream(
     only: str | None = Query(None, description="仅运行这些模块/分类，逗号分隔"),
     exclude: str | None = Query(None, description="排除这些模块/分类，逗号分隔"),
     profile: str | None = Query(None, description="档位：reliable（默认）或 full（全网完整搜索）"),
+    accept_language: str | None = Query(None, description="Accept-Language header override, e.g. '*', 'zh-CN'"),
 ) -> StreamingResponse:
     settings: Settings = request.app.state.settings
     only_list, exclude_list = _split_csv(only), _split_csv(exclude)
@@ -166,7 +167,11 @@ async def scan_stream(
         started = time.perf_counter()
         results = []
         try:
-            async with Engine(providers, settings) as engine:
+            # If caller provided accept_language, pass it to Engine via settings override
+            engine_kwargs = {}
+            if accept_language:
+                engine_kwargs["accept_language"] = accept_language
+            async with Engine(providers, settings, **engine_kwargs) as engine:
                 total = len(filter_providers(engine.providers, only_list, exclude_list))
                 yield _sse(
                     "start",
@@ -197,6 +202,7 @@ async def ai_investigate(
     request: Request,
     email: str = Query(..., description="要调查的邮箱"),
     consent: bool = Query(False, description="是否已确认授权声明"),
+    accept_language: str | None = Query(None, description="Accept-Language header override, e.g. '*', 'zh-CN'"),
 ) -> StreamingResponse:
     """AI 智能体：用大模型 API Key 调度扫描 + 公开搜索，汇总可能注册的站点。"""
     if not ai_configured():
@@ -213,7 +219,7 @@ async def ai_investigate(
     async def event_stream() -> AsyncIterator[str]:
         try:
             async for chunk in investigate_stream(
-                normalized, request.app.state.providers, settings
+                normalized, request.app.state.providers, settings, accept_language=accept_language
             ):
                 if await request.is_disconnected():
                     return

@@ -209,6 +209,11 @@ class AIInvestigator:
             timeout=90.0,
             verify=build_ssl_verify(self.settings),
             proxy=self.settings.proxy or None,
+            headers={
+                "Authorization": f"Bearer {cfg['api_key']}",
+                "Content-Type": "application/json",
+                **({"Accept-Language": getattr(self.settings, "_accept_language_override")} if getattr(self.settings, "_accept_language_override", None) else {}),
+            },
         ) as http:
             for round_i in range(max_rounds):
                 await self._emit("ai_thinking", {"round": round_i + 1, "max": max_rounds})
@@ -259,14 +264,7 @@ class AIInvestigator:
             "tool_choice": "auto",
             "temperature": 0.2,
         }
-        resp = await http.post(
-            url,
-            headers={
-                "Authorization": f"Bearer {cfg['api_key']}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-        )
+                resp = await http.post(url, json=payload)
         if resp.status_code >= 400:
             raise RuntimeError(f"AI API 错误 HTTP {resp.status_code}: {resp.text[:400]}")
         return resp.json()
@@ -352,6 +350,7 @@ async def investigate_stream(
     email: str,
     providers: list[Provider],
     settings: Settings,
+    accept_language: str | None = None,
 ) -> AsyncIterator[str]:
     queue: asyncio.Queue[tuple[str, dict] | None] = asyncio.Queue()
 
@@ -360,7 +359,12 @@ async def investigate_stream(
 
     async def runner() -> None:
         try:
+            # Propagate accept_language to backends by injecting into settings via Engine
+            # The aggregators and Engine will pick this up when constructing HTTP clients.
             agent = AIInvestigator(email, providers, settings, emit=emit)
+            if accept_language:
+                # stash on settings for downstream usage where applicable
+                setattr(settings, "_accept_language_override", accept_language)
             await agent.run()
         except Exception as exc:
             log.exception("AI 调查失败")

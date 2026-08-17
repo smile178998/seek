@@ -92,6 +92,12 @@ class ScanRequest(BaseModel):
     profile: Literal["reliable", "full"] | None = None
 
 
+class AIInvestigateRequest(BaseModel):
+    email: str
+    consent: bool = False
+    lang: Literal["zh", "en"] = "zh"
+
+
 class ScanResponse(BaseModel):
     summary: ScanSummary
     results: list[Result]

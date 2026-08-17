@@ -65,6 +65,24 @@ python -m seek.cli scan me@example.com -y --json
 
 ---
 
+## Secure Production Deployment
+
+The default binds only to `127.0.0.1` for local use. For an Internet-facing deployment, terminate HTTPS at a reverse proxy such as Caddy, Nginx, or Cloudflare and configure:
+
+```bash
+SEEK_ALLOWED_HOSTS=seek.example.com
+SEEK_DOCS_ENABLED=false
+SEEK_TRUST_PROXY_HEADERS=true
+SEEK_TRUSTED_PROXIES=127.0.0.1/32,::1/128
+SEEK_FORCE_HTTPS=true
+SEEK_HSTS_ENABLED=true
+```
+
+- Set `SEEK_TRUSTED_PROXIES` to the proxy's real IP/CIDR, never a catch-all network.
+- Enable HSTS only after HTTPS works reliably; a premature setting can make browsers reject HTTP.
+- For a multi-instance production service, replace the in-process limiter with Redis or gateway-level rate limiting and regularly audit dependencies.
+- Never commit API keys from `.env`; use the deployment platform's secret manager.
+
 ## AI Reliable Summary (Optional)
 
 The flow runs detectors first, then uses an LLM to summarize evidence (it does **not** invent registrations).

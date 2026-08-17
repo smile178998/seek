@@ -1,21 +1,32 @@
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
 import logging
 import time
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
+from urllib.parse import urlparse
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.datastructures import MutableHeaders
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from . import __version__
 from .ai_agent import ai_configured, ai_settings, investigate_stream
 from .config import Settings, get_settings
 from .engine import Engine
-from .models import ProviderInfo, ScanRequest, ScanResponse, ScanSummary
+from .models import (
+    AIInvestigateRequest,
+    ProviderInfo,
+    ScanRequest,
+    ScanResponse,
+    ScanSummary,
+)
 from .providers.registry import filter_providers, load_providers
 from .ratelimit import SlidingWindowLimiter
 from .utils import InvalidEmail, normalize_email, split_email
@@ -35,19 +46,104 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
 
 
+_settings = get_settings()
+
 app = FastAPI(
     title="seek",
     description="邮箱注册痕迹反查框架",
     version=__version__,
     lifespan=lifespan,
+    docs_url="/docs" if _settings.docs_enabled else None,
+    redoc_url="/redoc" if _settings.docs_enabled else None,
+    openapi_url="/openapi.json" if _settings.docs_enabled else None,
 )
 
 
+class SecurityHeadersMiddleware:
+    """Apply browser hardening without buffering streaming responses."""
+
+    def __init__(self, app, settings: Settings) -> None:
+        self.app = app
+        self.settings = settings
+
+    async def __call__(self, scope, receive, send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        header_map = {key.lower(): value for key, value in scope.get("headers", [])}
+        try:
+            content_length = int(header_map.get(b"content-length", b"0"))
+        except ValueError:
+            content_length = self.settings.max_request_bytes + 1
+        chunked_body = (
+            b"transfer-encoding" in header_map and b"content-length" not in header_map
+        )
+        if chunked_body or content_length > self.settings.max_request_bytes:
+            response = JSONResponse({"detail": "Request body too large"}, status_code=413)
+            await response(scope, receive, send)
+            return
+
+        async def secure_send(message) -> None:
+            if message["type"] == "http.response.start":
+                headers = MutableHeaders(scope=message)
+                headers["Content-Security-Policy"] = (
+                    "default-src 'self'; script-src 'self'; "
+                    "style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; "
+                    "connect-src 'self'; font-src 'self'; object-src 'none'; "
+                    "base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+                )
+                headers["X-Content-Type-Options"] = "nosniff"
+                headers["X-Frame-Options"] = "DENY"
+                headers["Referrer-Policy"] = "no-referrer"
+                headers["Permissions-Policy"] = (
+                    "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+                )
+                headers["Cross-Origin-Opener-Policy"] = "same-origin"
+                headers["Cross-Origin-Resource-Policy"] = "same-origin"
+                headers["X-Permitted-Cross-Domain-Policies"] = "none"
+                headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
+                if scope.get("path", "").startswith("/api/"):
+                    headers["Cache-Control"] = "no-store"
+                if self.settings.hsts_enabled:
+                    headers["Strict-Transport-Security"] = (
+                        "max-age=31536000; includeSubDomains"
+                    )
+            await send(message)
+
+        await self.app(scope, receive, secure_send)
+
+
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=_settings.host_allowlist)
+if _settings.force_https:
+    app.add_middleware(HTTPSRedirectMiddleware)
+app.add_middleware(SecurityHeadersMiddleware, settings=_settings)
+
+
 def client_key(request: Request) -> str:
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+    peer = request.client.host if request.client else None
+    settings: Settings = request.app.state.settings
+    if settings.is_trusted_proxy(peer):
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            candidate = forwarded.split(",", 1)[0].strip()
+            try:
+                return ipaddress.ip_address(candidate).compressed
+            except ValueError:
+                pass
+    return peer or "unknown"
+
+
+def _enforce_same_origin(request: Request) -> None:
+    if request.headers.get("sec-fetch-site", "").lower() == "cross-site":
+        raise HTTPException(status_code=403, detail="Cross-site requests are not allowed")
+    origin = request.headers.get("origin")
+    if not origin:
+        return
+    parsed = urlparse(origin)
+    expected_host = request.headers.get("host", "").lower()
+    if parsed.scheme not in {"http", "https"} or parsed.netloc.lower() != expected_host:
+        raise HTTPException(status_code=403, detail="Origin is not allowed")
 
 
 def guard(request: Request, email: str, consent: bool) -> str:
@@ -79,8 +175,10 @@ def guard(request: Request, email: str, consent: bool) -> str:
     return normalized
 
 
-def _split_csv(value: str | None) -> list[str]:
-    return [part.strip() for part in (value or "").split(",") if part.strip()]
+def _validate_selection(values: list[str]) -> list[str]:
+    if len(values) > 100 or any(len(value) > 64 for value in values):
+        raise HTTPException(status_code=422, detail="Too many or invalid provider filters")
+    return values
 
 
 def providers_for(request: Request, profile: str | None) -> list:
@@ -119,7 +217,6 @@ async def meta(request: Request) -> dict:
         "ai": {
             "configured": ai_configured(),
             "model": ai_settings()["model"] if ai_configured() else None,
-            "base_url": ai_settings()["base_url"] if ai_configured() else None,
             "profile": settings.normalize_profile(None, kind="ai"),
         },
     }
@@ -136,23 +233,24 @@ async def providers(
 @app.post("/api/scan", response_model=ScanResponse)
 async def scan(request: Request, payload: ScanRequest) -> ScanResponse:
     email = guard(request, payload.email, payload.consent)
+    only = _validate_selection(payload.only)
+    exclude = _validate_selection(payload.exclude)
     settings: Settings = request.app.state.settings
     providers = providers_for(request, payload.profile)
     async with Engine(providers, settings) as engine:
-        return await engine.scan(email, payload.only, payload.exclude)
+        return await engine.scan(email, only, exclude)
 
 
-@app.get("/api/scan/stream")
-async def scan_stream(
+async def _scan_stream_impl(
     request: Request,
-    email: str = Query(..., description="要查询的邮箱"),
-    consent: bool = Query(False, description="是否已确认授权声明"),
-    only: str | None = Query(None, description="仅运行这些模块/分类，逗号分隔"),
-    exclude: str | None = Query(None, description="排除这些模块/分类，逗号分隔"),
-    profile: str | None = Query(None, description="档位：reliable（默认）或 full（全网完整搜索）"),
+    email: str,
+    consent: bool,
+    only_list: list[str],
+    exclude_list: list[str],
+    profile: str | None,
 ) -> StreamingResponse:
     settings: Settings = request.app.state.settings
-    only_list, exclude_list = _split_csv(only), _split_csv(exclude)
+    _enforce_same_origin(request)
     resolved_profile = settings.normalize_profile(profile, kind="scan")
     providers = providers_for(request, profile)
 
@@ -185,21 +283,35 @@ async def scan_stream(
             raise
         except Exception as exc:
             log.exception("扫描过程出错")
-            yield _sse("error", {"message": f"{type(exc).__name__}: {exc}"})
+            yield _sse("error", {"message": "Operation failed; please try again later"})
 
     return StreamingResponse(
         event_stream(), media_type="text/event-stream", headers=SSE_HEADERS
     )
 
 
-@app.get("/api/ai/investigate")
-async def ai_investigate(
+@app.post("/api/scan/stream")
+async def scan_stream(request: Request, payload: ScanRequest) -> StreamingResponse:
+    _validate_selection(payload.only)
+    _validate_selection(payload.exclude)
+    return await _scan_stream_impl(
+        request,
+        email=payload.email,
+        consent=payload.consent,
+        only_list=payload.only,
+        exclude_list=payload.exclude,
+        profile=payload.profile,
+    )
+
+
+async def _ai_investigate_impl(
     request: Request,
-    email: str = Query(..., description="要调查的邮箱"),
-    consent: bool = Query(False, description="是否已确认授权声明"),
-    lang: str = Query("zh", description="报告语言：zh 或 en"),
+    email: str,
+    consent: bool,
+    lang: str,
 ) -> StreamingResponse:
     """AI 智能体：用大模型 API Key 调度扫描 + 公开搜索，汇总可能注册的站点。"""
+    _enforce_same_origin(request)
     if not ai_configured():
         return _sse_error_response(
             "未配置 AI API Key。请在 .env 设置 SEEK_AI_API_KEY（兼容 OpenAI / DeepSeek 等）"
@@ -224,10 +336,22 @@ async def ai_investigate(
             raise
         except Exception as exc:
             log.exception("AI 调查流出错")
-            yield _sse("error", {"message": f"{type(exc).__name__}: {exc}"})
+            yield _sse("error", {"message": "Operation failed; please try again later"})
 
     return StreamingResponse(
         event_stream(), media_type="text/event-stream", headers=SSE_HEADERS
+    )
+
+
+@app.post("/api/ai/investigate")
+async def ai_investigate(
+    request: Request, payload: AIInvestigateRequest
+) -> StreamingResponse:
+    return await _ai_investigate_impl(
+        request,
+        email=payload.email,
+        consent=payload.consent,
+        lang=payload.lang,
     )
 
 
@@ -236,7 +360,7 @@ def _sse(event: str, data: dict) -> str:
 
 
 SSE_HEADERS = {
-    "Cache-Control": "no-cache",
+    "Cache-Control": "no-store",
     "Connection": "keep-alive",
     "X-Accel-Buffering": "no",
 }
@@ -250,7 +374,6 @@ def _sse_error_response(message: str) -> StreamingResponse:
 
 
 # ---------- 静态前端 ----------
-_settings = get_settings()
 if _settings.web_dir.exists():
     app.mount("/static", StaticFiles(directory=_settings.web_dir), name="static")
 

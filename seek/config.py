@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ipaddress
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -26,6 +27,19 @@ class Settings(BaseSettings):
 
     host: str = "127.0.0.1"
     port: int = 8000
+
+    # ---------- Web security ----------
+    # Comma-separated hostnames accepted in the Host header. Add the public
+    # domain explicitly when deploying behind a reverse proxy.
+    allowed_hosts: str = "127.0.0.1,localhost"
+    # Forwarded client IP headers are ignored unless both this switch is on
+    # and the direct peer belongs to trusted_proxies.
+    trust_proxy_headers: bool = False
+    trusted_proxies: str = "127.0.0.1/32,::1/128"
+    force_https: bool = False
+    hsts_enabled: bool = False
+    docs_enabled: bool = True
+    max_request_bytes: int = 32_768
 
     concurrency: int = 24
     timeout: float = 12.0
@@ -58,6 +72,35 @@ class Settings(BaseSettings):
     @property
     def domain_allowlist(self) -> set[str]:
         return {d.strip().lower() for d in self.allowed_domains.split(",") if d.strip()}
+
+    @property
+    def host_allowlist(self) -> list[str]:
+        hosts = [h.strip().lower() for h in self.allowed_hosts.split(",") if h.strip()]
+        return hosts or ["127.0.0.1", "localhost"]
+
+    @property
+    def trusted_proxy_networks(
+        self,
+    ) -> tuple[ipaddress.IPv4Network | ipaddress.IPv6Network, ...]:
+        networks = []
+        for raw in self.trusted_proxies.split(","):
+            value = raw.strip()
+            if not value:
+                continue
+            try:
+                networks.append(ipaddress.ip_network(value, strict=False))
+            except ValueError:
+                continue
+        return tuple(networks)
+
+    def is_trusted_proxy(self, host: str | None) -> bool:
+        if not self.trust_proxy_headers or not host:
+            return False
+        try:
+            address = ipaddress.ip_address(host)
+        except ValueError:
+            return False
+        return any(address in network for network in self.trusted_proxy_networks)
 
     def is_domain_allowed(self, domain: str) -> bool:
         allow = self.domain_allowlist

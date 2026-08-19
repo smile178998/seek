@@ -92,6 +92,14 @@ class ScanRequest(BaseModel):
     profile: Literal["reliable", "full"] | None = None
 
 
+class PhoneScanRequest(BaseModel):
+    phone: str
+    consent: bool = False
+    only: list[str] = Field(default_factory=list)
+    exclude: list[str] = Field(default_factory=list)
+    profile: Literal["reliable", "full"] | None = None
+
+
 class AIInvestigateRequest(BaseModel):
     email: str
     consent: bool = False

@@ -113,3 +113,14 @@ def test_sensitive_stream_endpoints_are_post_only() -> None:
     }
     assert methods["/api/scan/stream"] == {"POST"}
     assert methods["/api/ai/investigate"] == {"POST"}
+
+
+def test_phone_stream_returns_structured_validation_error() -> None:
+    with TestClient(app, base_url="http://localhost") as client:
+        response = client.post(
+            "/api/phone-scan/stream",
+            json={"phone": "+31 (0)20", "consent": True},
+        )
+    assert response.status_code == 200
+    assert '"code": "invalid_phone"' in response.text
+    assert "Invalid phone number:" in response.text

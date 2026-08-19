@@ -1,0 +1,22 @@
+# Phone-capable definitions are opt-in and must use phone_request.
+# Available variables: {phone}, {phone_digits}, {phone_urlenc}, {phone_sha256}
+# Add phone_rules and phone_default/phone_default_detail as needed.
+name: example_phone_site
+title: Example phone site
+category: other
+homepage: https://example.com
+enabled: false
+
+phone_request:
+  method: GET
+  url: "https://example.com/account/phone-check?phone={phone_urlenc}"
+
+phone_rules:
+  - registered_if:
+      body_contains: ["phone_exists"]
+  - not_registered_if:
+      body_contains: ["phone_available"]
+  - rate_limited_if:
+      status_in: [403, 429]
+
+phone_default: unknown

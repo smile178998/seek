@@ -9,7 +9,7 @@ import httpx
 
 from .config import Settings, build_ssl_verify, get_settings
 from .models import Result, ScanResponse, ScanSummary, Status
-from .providers.base import CheckContext, Provider
+from .providers.base import CheckContext, PhoneCheckContext, Provider
 from .providers.registry import filter_providers, load_providers
 
 log = logging.getLogger(__name__)
@@ -162,6 +162,56 @@ class Engine:
             summary=ScanSummary.from_results(email, results, elapsed_ms),
             results=results,
         )
+
+    async def scan_phone(
+        self,
+        phone: str,
+        only: list[str] | None = None,
+        exclude: list[str] | None = None,
+    ) -> ScanResponse:
+        started = time.perf_counter()
+        results = [r async for r in self.stream_phone(phone, only, exclude)]
+        results.sort(key=lambda r: (_STATUS_ORDER.get(r.status, 99), r.category, r.title))
+        elapsed_ms = int((time.perf_counter() - started) * 1000)
+        return ScanResponse(
+            summary=ScanSummary.from_results(phone, results, elapsed_ms),
+            results=results,
+        )
+
+    async def stream_phone(
+        self,
+        phone: str,
+        only: list[str] | None = None,
+        exclude: list[str] | None = None,
+    ) -> AsyncIterator[Result]:
+        selected = [
+            provider
+            for provider in filter_providers(self.providers, only, exclude)
+            if provider.supports_phone
+        ]
+        semaphore = asyncio.Semaphore(max(1, self.settings.concurrency))
+        ctx = PhoneCheckContext(phone=phone, client=self.client, timeout=self.settings.timeout)
+
+        async def run(provider: Provider) -> Result:
+            if not provider.info.ready:
+                return provider.make_result(Status.SKIPPED, detail=provider.info.unready_reason or "模块未就绪")
+            async with semaphore:
+                try:
+                    return await asyncio.wait_for(provider.check_phone(ctx), provider.execution_timeout(ctx))
+                except asyncio.TimeoutError:
+                    return provider.make_result(Status.ERROR, detail="模块执行超时")
+                except Exception as exc:
+                    return provider.make_result(Status.ERROR, detail=f"模块异常: {type(exc).__name__}: {exc}")
+
+        tasks = [asyncio.create_task(run(provider)) for provider in selected]
+        try:
+            for finished in asyncio.as_completed(tasks):
+                yield await finished
+        finally:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
 
 
 _STATUS_ORDER = {

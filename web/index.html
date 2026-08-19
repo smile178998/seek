@@ -28,6 +28,7 @@
       <div class="mode-row" id="mode-row">
         <button type="button" class="mode-chip" data-mode="scan" data-profile="reliable" data-i18n="reliableScan">可靠扫描</button>
         <button type="button" class="mode-chip on" data-mode="scan" data-profile="full" data-i18n="extendedScan">扩展扫描</button>
+        <button type="button" class="mode-chip" data-mode="phone" data-i18n="phoneScan">手机号扫描</button>
         <button type="button" class="mode-chip" data-mode="ai" id="mode-ai" data-i18n="aiSummaryMode">AI 可靠汇总</button>
         <span id="mode-status" class="mode-hint" data-i18n="extendedHint">扩展扫描：覆盖更多候选站点，耗时和受限结果会增加</span>
       </div>
@@ -38,7 +39,7 @@
             <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.6"/>
             <path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6"/>
           </svg>
-          <input id="email" type="email" placeholder="somebody@example.com" autocomplete="off"
+          <input id="email" type="email" placeholder="somebody@example.com" data-i18n-placeholder="emailPlaceholder" autocomplete="off"
                  spellcheck="false" />
         </div>
         <button id="run" class="btn btn-primary">

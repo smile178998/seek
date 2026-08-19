@@ -10,6 +10,7 @@ typer==0.15.1
 rich==13.9.4
 dnspython==2.7.0
 email-validator==2.2.0
+phonenumbers==9.0.10
 truststore==0.10.4
 
 # Security floors for transitive dependencies used by optional scanners.

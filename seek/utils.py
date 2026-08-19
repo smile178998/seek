@@ -8,6 +8,8 @@ from typing import Any
 from urllib.parse import quote
 
 from email_validator import EmailNotValidError, validate_email
+import phonenumbers
+from phonenumbers import NumberParseException
 
 _VAR_RE = re.compile(r"\{([A-Za-z0-9_.]+)\}")
 
@@ -20,6 +22,10 @@ class InvalidEmail(ValueError):
     pass
 
 
+class InvalidPhone(ValueError):
+    pass
+
+
 def normalize_email(raw: str) -> str:
     """校验语法并返回归一化后的邮箱（不做投递性检测，避免额外网络请求）。"""
     try:
@@ -27,6 +33,27 @@ def normalize_email(raw: str) -> str:
     except EmailNotValidError as exc:
         raise InvalidEmail(str(exc)) from exc
     return info.normalized
+
+
+def normalize_phone(raw: str) -> str:
+    """Normalize a phone number to E.164 for any country without network calls."""
+    value = raw.strip()
+    if not value:
+        raise InvalidPhone("phone number is required")
+    if value.startswith("00"):
+        value = "+" + value[2:]
+    if not value.startswith("+"):
+        raise InvalidPhone("include the international country code, for example +31 20 500 1086")
+    value = re.sub(r"(\+\d{1,3})\s*\(0\)", r"\1", value)
+    try:
+        parsed = phonenumbers.parse(value, None)
+    except NumberParseException as exc:
+        raise InvalidPhone("phone number could not be parsed") from exc
+    if not phonenumbers.is_possible_number(parsed):
+        raise InvalidPhone("phone number length or country code is not possible")
+    if not phonenumbers.is_valid_number(parsed):
+        raise InvalidPhone("phone number is not valid for its country")
+    return phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
 
 
 def split_email(email: str) -> tuple[str, str]:
@@ -53,6 +80,29 @@ def build_context(email: str, extra: dict[str, Any] | None = None) -> dict[str, 
         "domain": domain,
         "nonce": secrets.token_hex(8),
         "random_password": random_password(),
+    }
+    if extra:
+        ctx.update(extra)
+    return ctx
+
+
+def build_phone_context(phone: str, extra: dict[str, Any] | None = None) -> dict[str, Any]:
+    digits = re.sub(r"\D", "", phone)
+    ctx: dict[str, Any] = {
+        "phone": phone,
+        "phone_digits": digits,
+        "phone_urlenc": quote(phone, safe=""),
+        "phone_sha256": _digest("sha256", phone),
+        # Existing email rules can reuse their request templates in phone mode.
+        "email": phone,
+        "email_lower": phone.lower(),
+        "email_urlenc": quote(phone, safe=""),
+        "email_md5": _digest("md5", phone),
+        "email_sha1": _digest("sha1", phone),
+        "email_sha256": _digest("sha256", phone),
+        "local": phone,
+        "local_urlenc": quote(phone, safe=""),
+        "domain": "",
     }
     if extra:
         ctx.update(extra)

@@ -23,13 +23,14 @@ from .engine import Engine
 from .models import (
     AIInvestigateRequest,
     ProviderInfo,
+    PhoneScanRequest,
     ScanRequest,
     ScanResponse,
     ScanSummary,
 )
 from .providers.registry import filter_providers, load_providers
 from .ratelimit import SlidingWindowLimiter
-from .utils import InvalidEmail, normalize_email, split_email
+from .utils import InvalidEmail, InvalidPhone, normalize_email, normalize_phone, split_email
 
 log = logging.getLogger(__name__)
 
@@ -175,6 +176,28 @@ def guard(request: Request, email: str, consent: bool) -> str:
     return normalized
 
 
+def guard_phone(request: Request, phone: str, consent: bool) -> str:
+    settings: Settings = request.app.state.settings
+    try:
+        normalized = normalize_phone(phone)
+    except InvalidPhone as exc:
+        raise HTTPException(status_code=422, detail=f"Invalid phone number: {exc}") from exc
+    if settings.require_consent and not consent:
+        raise HTTPException(status_code=403, detail="Consent is required before starting a scan")
+    allowed, retry_after = request.app.state.limiter.check(client_key(request))
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Too many requests; retry in {retry_after} seconds",
+            headers={"Retry-After": str(retry_after)},
+        )
+    return normalized
+
+
+def _stream_error(message: str, code: str) -> StreamingResponse:
+    return _sse_error_response(message, code=code)
+
+
 def _validate_selection(values: list[str]) -> list[str]:
     if len(values) > 100 or any(len(value) > 64 for value in values):
         raise HTTPException(status_code=422, detail="Too many or invalid provider filters")
@@ -194,6 +217,16 @@ def providers_for(request: Request, profile: str | None) -> list:
         cached = load_providers(settings, profile="full", include_holehe=True)
         request.app.state.providers_full = cached
         log.info("完整模式已加载 %d 个模块", len(cached))
+    return cached
+
+
+def phone_providers_for(request: Request) -> list:
+    """Load opt-in YAML phone providers without unrelated optional backends."""
+    settings: Settings = request.app.state.settings
+    cached = getattr(request.app.state, "providers_phone", None)
+    if cached is None:
+        cached = load_providers(settings, profile="full", include_holehe=False)
+        request.app.state.providers_phone = cached
     return cached
 
 
@@ -239,6 +272,17 @@ async def scan(request: Request, payload: ScanRequest) -> ScanResponse:
     providers = providers_for(request, payload.profile)
     async with Engine(providers, settings) as engine:
         return await engine.scan(email, only, exclude)
+
+
+@app.post("/api/phone-scan", response_model=ScanResponse)
+async def phone_scan(request: Request, payload: PhoneScanRequest) -> ScanResponse:
+    phone = guard_phone(request, payload.phone, payload.consent)
+    only = _validate_selection(payload.only)
+    exclude = _validate_selection(payload.exclude)
+    settings: Settings = request.app.state.settings
+    providers = phone_providers_for(request)
+    async with Engine(providers, settings) as engine:
+        return await engine.scan_phone(phone, only, exclude)
 
 
 async def _scan_stream_impl(
@@ -304,6 +348,50 @@ async def scan_stream(request: Request, payload: ScanRequest) -> StreamingRespon
     )
 
 
+@app.post("/api/phone-scan/stream")
+async def phone_scan_stream(request: Request, payload: PhoneScanRequest) -> StreamingResponse:
+    _validate_selection(payload.only)
+    _validate_selection(payload.exclude)
+    _enforce_same_origin(request)
+    settings = request.app.state.settings
+    resolved_profile = "full"
+    providers = phone_providers_for(request)
+    try:
+        normalized = guard_phone(request, payload.phone, payload.consent)
+    except HTTPException as exc:
+        code = "invalid_phone" if exc.status_code == 422 else "rate_limited" if exc.status_code == 429 else "forbidden"
+        return _stream_error(str(exc.detail), code)
+
+    log.info("Phone scan requested: phone=%s providers=%d", normalized, len(providers))
+
+    async def event_stream() -> AsyncIterator[str]:
+        started = time.perf_counter()
+        results = []
+        try:
+            async with Engine(providers, settings) as engine:
+                total = sum(
+                    1
+                    for provider in filter_providers(engine.providers, payload.only, payload.exclude)
+                    if provider.supports_phone
+                )
+                yield _sse("start", {"phone": normalized, "total": total, "profile": resolved_profile})
+                async for result in engine.stream_phone(normalized, payload.only, payload.exclude):
+                    if await request.is_disconnected():
+                        return
+                    results.append(result)
+                    yield _sse("result", result.model_dump(mode="json"))
+            elapsed = int((time.perf_counter() - started) * 1000)
+            yield _sse("summary", ScanSummary.from_results(normalized, results, elapsed).model_dump(mode="json"))
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            log.exception("Phone scan failed: phone=%s", normalized)
+            message = str(exc) if settings.debug else "Phone scan failed on the server"
+            yield _sse("error", {"code": "backend_error", "message": message})
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream", headers=SSE_HEADERS)
+
+
 async def _ai_investigate_impl(
     request: Request,
     email: str,
@@ -366,9 +454,9 @@ SSE_HEADERS = {
 }
 
 
-def _sse_error_response(message: str) -> StreamingResponse:
+def _sse_error_response(message: str, *, code: str = "backend_error") -> StreamingResponse:
     async def one_shot() -> AsyncIterator[str]:
-        yield _sse("error", {"message": message})
+        yield _sse("error", {"code": code, "message": message})
 
     return StreamingResponse(one_shot(), media_type="text/event-stream", headers=SSE_HEADERS)
 

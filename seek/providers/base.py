@@ -19,6 +19,15 @@ class CheckContext:
     timeout: float
 
 
+@dataclass
+class PhoneCheckContext:
+    """Runtime dependencies for a phone-number check."""
+
+    phone: str
+    client: httpx.AsyncClient
+    timeout: float
+
+
 class Provider(abc.ABC):
     """所有检测模块的基类。"""
 
@@ -33,9 +42,16 @@ class Provider(abc.ABC):
         """Return the scheduler's wall-clock budget for this provider."""
         return ctx.timeout + 2.0
 
+    @property
+    def supports_phone(self) -> bool:
+        return False
+
     @abc.abstractmethod
     async def check(self, ctx: CheckContext) -> Result:  # pragma: no cover - 接口定义
         ...
+
+    async def check_phone(self, ctx: PhoneCheckContext) -> Result:
+        return self.make_result(Status.SKIPPED, detail="模块不支持 phone scans")
 
     def make_result(
         self,

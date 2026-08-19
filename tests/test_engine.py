@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from seek.engine import Engine  # noqa: E402
 from seek.models import Status  # noqa: E402
 from seek.providers.declarative import DeclarativeProvider, build_provider_info  # noqa: E402
-from seek.utils import build_context, json_path, normalize_email, render  # noqa: E402
+from seek.utils import build_context, json_path, normalize_email, normalize_phone, render  # noqa: E402
 
 EMAIL = "alice@example.com"
 
@@ -162,6 +162,83 @@ def test_template_and_jsonpath():
 
     assert normalize_email("  Alice@Example.COM ") == "Alice@example.com"
     print("[ok] 模板变量 / JSON 路径 / 邮箱归一化")
+
+
+def test_phone_scan_uses_phone_request_context():
+    spec = {
+        "name": "phone_site",
+        "title": "Phone site",
+        "category": "social",
+        "phone_request": {
+            "method": "GET",
+            "url": "https://phone.test/check?phone={phone_urlenc}&digits={phone_digits}",
+        },
+        "phone_rules": [
+            {"registered_if": {"body_contains": ["phone_exists"]}},
+            {"not_registered_if": {"body_contains": ["phone_available"]}},
+        ],
+        "phone_default": "unknown",
+    }
+    provider = make_provider(spec)
+
+    async def go():
+        transport = httpx.MockTransport(
+            lambda request: httpx.Response(200, text="phone_exists")
+        )
+        async with Engine([provider], transport=transport) as engine:
+            return await engine.scan_phone("+1 (202) 555-0123")
+
+    result = asyncio.run(go()).results[0]
+    assert result.status is Status.REGISTERED
+    assert normalize_phone("00 1 202 555 0123") == "+12025550123"
+    print("[ok] 手机号模板变量 / 扫描流程")
+
+
+def test_phone_normalization_accepts_international_formats():
+    assert normalize_phone("+31 20 500 1086") == "+31205001086"
+    assert normalize_phone("+31 (0)20 500 1086") == "+31205001086"
+    assert normalize_phone("+31612345678") == "+31612345678"
+    assert normalize_phone("+1 (202) 555-0123") == "+12025550123"
+    assert normalize_phone("+44 20 7946 0958") == "+442079460958"
+    assert normalize_phone("+91 98765 43210") == "+919876543210"
+    assert normalize_phone("+81 3 1234 5678") == "+81312345678"
+
+
+def test_phone_normalization_rejects_ambiguous_national_number():
+    from seek.utils import InvalidPhone
+
+    try:
+        normalize_phone("020 500 1086")
+    except InvalidPhone as exc:
+        assert "international country code" in str(exc)
+    else:
+        raise AssertionError("national-only phone number was accepted")
+
+
+def test_existing_request_definitions_support_phone_fallback():
+    spec = {
+        "name": "shared_site",
+        "title": "Shared site",
+        "category": "social",
+        "request": {
+            "method": "GET",
+            "url": "https://phone.test/check?value={email_sha256}",
+        },
+        "rules": [{"registered_if": {"body_contains": ["exists"]}}],
+    }
+    provider = make_provider(spec)
+    assert provider.supports_phone
+
+    async def go():
+        transport = httpx.MockTransport(
+            lambda request: httpx.Response(200, text="exists")
+        )
+        async with Engine([provider], transport=transport) as engine:
+            return await engine.scan_phone("+12025550123")
+
+    result = asyncio.run(go()).results[0]
+    assert result.status is Status.REGISTERED
+    print("[ok] 现有网站规则兼容手机号扫描")
 
 
 def test_prepare_multistep_with_csrf():

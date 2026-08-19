@@ -1,0 +1,20 @@
+name: youtube
+title: YouTube
+category: media
+homepage: https://www.youtube.com
+description: Public sign-in page probe
+notes: YouTube account checks use Google authentication; no reliable public email lookup is exposed.
+
+request:
+  method: GET
+  url: "https://accounts.google.com/ServiceLogin?service=youtube"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+    detail: YouTube or Google blocked or rate-limited the request
+
+default: unknown
+default_detail: YouTube does not expose a reliable public email lookup result

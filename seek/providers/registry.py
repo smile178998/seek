@@ -64,7 +64,8 @@ def load_providers(
     definition_keys = {
         _site_key(str(spec.get("name") or path.stem))
         for path, spec in definition_files
-        if spec.get("enabled", True) and "request" in spec
+        if spec.get("enabled", True)
+        and ("request" in spec or "phone_request" in spec)
     }
 
     user_scanner_providers = load_user_scanner_providers(
@@ -97,8 +98,8 @@ def load_providers(
         if not info.enabled:
             log.debug("规则已禁用，跳过: %s", info.name)
             continue
-        if "request" not in spec:
-            log.error("规则缺少 request 段: %s", path.name)
+        if "request" not in spec and "phone_request" not in spec:
+            log.error("规则缺少 request 或 phone_request 段: %s", path.name)
             continue
         if _site_key(info.name) in user_scanner_keys:
             log.debug("using user-scanner instead of duplicate YAML module: %s", info.name)

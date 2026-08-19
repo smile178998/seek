@@ -1,0 +1,20 @@
+name: google_phone
+title: Google phone account
+category: mail
+homepage: https://accounts.google.com
+description: Phone sign-in flow probe
+notes: Google uses anti-enumeration and browser checks; this module never treats a generic response as proof of registration.
+
+phone_request:
+  method: GET
+  url: "https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/"
+  headers:
+    Accept: "text/html"
+
+phone_rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+    detail: Google blocked or rate-limited the request
+
+phone_default: unknown
+phone_default_detail: Google did not expose a conclusive public phone account result

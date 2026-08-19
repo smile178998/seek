@@ -113,6 +113,7 @@ Copy `.env.example` to `.env` and edit as needed:
 | `SEEK_CONCURRENCY` | `24` | Concurrent requests; balances 100+ module speed and DNS stability |
 | `SEEK_TIMEOUT` | `12` | Native-rule timeout; multi-step User Scanner checks get a separate whole-check budget (upstream allows 15 seconds per request) |
 | `SEEK_SCAN_PROFILE` | `reliable` | `reliable` or `full`; the Web UI starts in full mode |
+| `SEEK_DEBUG` | `false` | Set to `true` in development to return backend exception details for phone scans; keep `false` in production |
 | `SEEK_AI_PROFILE` | `reliable` | AI aggregation profile; `full` includes Holehe |
 | `SEEK_PROXY` | empty | Proxy, e.g. `http://127.0.0.1:7890` |
 | `SEEK_ALLOWED_DOMAINS` | empty | Allowed email domains (comma-separated) |
@@ -165,6 +166,10 @@ For CSRF / multi-step flows, use `prepare`. See `spotify.yaml` and `duolingo.yam
 ### Option 2: Python
 
 Create a module under `seek/providers/builtin/`, subclass `Provider`, decorate with `@register`, and import it from `builtin/__init__.py`.
+
+### Phone-number scans
+
+The API also exposes `POST /api/phone-scan` and `POST /api/phone-scan/stream`. Existing website definitions also participate in phone scans through a compatibility fallback; add `phone_request` and `phone_rules` when a site needs a different endpoint. Available variables are `{phone}`, `{phone_digits}`, `{phone_urlenc}`, and `{phone_sha256}`. Only scan your own number or a number you are authorized to assess; many providers intentionally return ambiguous responses.
 
 ---
 

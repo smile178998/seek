@@ -97,7 +97,9 @@ const UI_TEXT = {
     apiDocs: "API 文档", reliableScan: "可靠扫描", extendedScan: "扩展扫描",
     aiSummaryMode: "AI 可靠汇总", reliableHint: "可靠扫描：仅运行已验证站点，速度更快",
     extendedHint: "扩展扫描：覆盖更多候选站点，耗时和受限结果会增加",
-    startQuery: "开始查询", startExtended: "开始扩展查询", startAi: "开始 AI 汇总",
+    startQuery: "开始查询", startExtended: "开始扩展查询", startPhone: "查询手机号", startAi: "开始 AI 汇总",
+    phoneScan: "手机号扫描", phoneHint: "手机号扫描：仅运行已配置 phone_request 的站点",
+    emailPlaceholder: "somebody@example.com", phonePlaceholder: "+1 202 555 0123", enterPhone: "请输入手机号",
     stop: "停止", preparing: "准备中…", filterSites: "过滤站点…",
     exportJson: "导出 JSON", exportCsv: "导出 CSV", emptyResults: "没有符合当前筛选条件的结果",
     aiReport: "AI 汇总报告", confirmedRegistered: "已确认注册", domainIntel: "域名 / 邮箱情报",
@@ -112,7 +114,10 @@ const UI_TEXT = {
     configureAi: "请先在 .env 配置 SEEK_AI_API_KEY 并重启服务", enterEmail: "请输入要查询的邮箱",
     connecting: "正在建立连接…", reliableLabel: "可靠扫描", extendedLabel: "扩展扫描",
     scanning: "正在检测", scanComplete: "检测完成", elapsed: "耗时", seconds: "秒",
-    serverError: "服务端返回了错误", connectionInterrupted: "连接中断，请检查邮箱格式或访问频率限制",
+    serverError: "服务端返回了错误", connectionInterrupted: "请求中断，请检查后端服务、网络或访问频率限制",
+    invalidPhone: "手机号格式无效，请使用国际格式", authFailure: "第三方服务认证失败",
+    rateLimitFailure: "请求被限流，请稍后重试", timeoutFailure: "请求超时，请稍后重试",
+    corsFailure: "跨域请求被浏览器阻止，请使用后端提供的网页地址", emptyScan: "没有可用的手机号扫描目标",
     interrupted: "已中断", aiReady: "AI 已就绪", reliableTier: "可靠档", extendedTier: "扩展档",
     aiAggregating: "检测聚合中", runningTools: "正在运行可靠检测工具…", toolRunning: "工具运行中",
     model: "模型", tier: "档位", startingBackends: "启动后端", modules: "模块", completed: "完成",
@@ -127,7 +132,9 @@ const UI_TEXT = {
     apiDocs: "API Docs", reliableScan: "Reliable scan", extendedScan: "Extended scan",
     aiSummaryMode: "AI summary", reliableHint: "Reliable scan: verified sites only, with faster results",
     extendedHint: "Extended scan: more candidate sites, with longer runtimes and more blocked results",
-    startQuery: "Start scan", startExtended: "Start extended scan", startAi: "Start AI summary",
+    startQuery: "Start scan", startExtended: "Start extended scan", startPhone: "Scan phone number", startAi: "Start AI summary",
+    phoneScan: "Phone scan", phoneHint: "Phone scan: only sites with phone_request are checked",
+    emailPlaceholder: "somebody@example.com", phonePlaceholder: "+1 202 555 0123", enterPhone: "Enter a phone number",
     stop: "Stop", preparing: "Preparing…", filterSites: "Filter sites…",
     exportJson: "Export JSON", exportCsv: "Export CSV", emptyResults: "No results match the current filters",
     aiReport: "AI Summary Report", confirmedRegistered: "Confirmed registrations",
@@ -144,7 +151,10 @@ const UI_TEXT = {
     enterEmail: "Enter an email address to scan", connecting: "Connecting…",
     reliableLabel: "Reliable scan", extendedLabel: "Extended scan", scanning: "Scanning",
     scanComplete: "Scan complete", elapsed: "Elapsed", seconds: "seconds", serverError: "The server returned an error",
-    connectionInterrupted: "Connection interrupted. Check the email format or request rate limit",
+    connectionInterrupted: "Request interrupted. Check the backend, network, or rate limit",
+    invalidPhone: "Invalid phone number format. Use international format", authFailure: "The third-party service rejected authentication",
+    rateLimitFailure: "The request was rate limited. Try again later", timeoutFailure: "The request timed out. Try again later",
+    corsFailure: "The browser blocked the cross-origin request. Use the backend web address", emptyScan: "No phone scan targets are available",
     interrupted: "Interrupted", aiReady: "AI ready", reliableTier: "Reliable tier", extendedTier: "Extended tier",
     aiAggregating: "Aggregating scan results", runningTools: "Running reliable detection tools…",
     toolRunning: "Tool running", model: "Model", tier: "Tier", startingBackends: "Starting backends",
@@ -227,6 +237,7 @@ function applyLanguage() {
   toggle.textContent = t("languageButton");
   toggle.setAttribute("aria-label", t("switchLanguage"));
   updateModeHint();
+  updateInputMode();
   setRunning(!!state.source);
   render();
   if (state.results.length) renderStats();
@@ -284,13 +295,22 @@ function setMode(mode, profile = null) {
   if (mode === "scan" && profile) state.scanProfile = profile;
   document.querySelectorAll(".mode-chip").forEach((c) => {
     const selected = c.dataset.mode === mode &&
-      (mode === "ai" || c.dataset.profile === state.scanProfile);
+      (mode === "ai" || mode === "phone" || c.dataset.profile === state.scanProfile);
     c.classList.toggle("on", selected);
   });
   el("run").querySelector(".btn-label").textContent =
-    mode === "ai" ? t("startAi") :
+    mode === "ai" ? t("startAi") : mode === "phone" ? t("startPhone") :
       state.scanProfile === "full" ? t("startExtended") : t("startQuery");
+  updateInputMode();
   updateModeHint();
+}
+
+function updateInputMode() {
+  const input = el("email");
+  const phone = state.mode === "phone";
+  input.type = phone ? "tel" : "email";
+  input.placeholder = t(phone ? "phonePlaceholder" : "emailPlaceholder");
+  input.setAttribute("aria-label", t(phone ? "phoneScan" : "emailPlaceholder"));
 }
 
 function applyMeta(meta) {
@@ -309,6 +329,10 @@ function applyMeta(meta) {
 
 function updateModeHint() {
   const hint = el("mode-status");
+  if (state.mode === "phone") {
+    hint.textContent = t("phoneHint");
+    return;
+  }
   if (state.mode === "ai") {
     const meta = state.aiMeta || {};
     hint.textContent = `${t("aiReady")} · ${meta.model || ""} · ${meta.profile === "full" ? t("extendedTier") : t("reliableTier")}`;
@@ -322,6 +346,7 @@ function updateModeHint() {
 /* ---------------- 扫描 ---------------- */
 function createPostEventStream(url, payload) {
   const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(new DOMException("Request timed out", "TimeoutError")), 90000);
   const listeners = new Map();
   let closed = false;
   const source = {
@@ -332,6 +357,7 @@ function createPostEventStream(url, payload) {
     },
     close() {
       closed = true;
+      clearTimeout(timeoutId);
       controller.abort();
     },
   };
@@ -350,7 +376,24 @@ function createPostEventStream(url, payload) {
         referrerPolicy: "no-referrer",
         signal: controller.signal,
       });
-      if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok || !response.body) {
+        const body = await response.text();
+        let detail = body;
+        try {
+          const parsed = JSON.parse(body);
+          detail = Array.isArray(parsed.detail)
+            ? parsed.detail.map((item) => item.msg || item).join("; ")
+            : parsed.detail || parsed.message || body;
+        } catch {
+          // Keep the raw response when the server did not return JSON.
+        }
+        dispatch("error", JSON.stringify({
+          code: response.status === 422 ? "invalid_phone" : response.status === 401 || response.status === 403 ? "auth_failure" : response.status === 429 ? "rate_limited" : "backend_error",
+          status: response.status,
+          message: detail || `HTTP ${response.status}`,
+        }));
+        return;
+      }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -371,8 +414,13 @@ function createPostEventStream(url, payload) {
         if (done) break;
       }
       if (!closed) dispatch("error");
+      clearTimeout(timeoutId);
     } catch (error) {
-      if (!closed && error.name !== "AbortError") dispatch("error");
+      clearTimeout(timeoutId);
+      if (!closed && error.name !== "AbortError") {
+        const code = error.name === "TimeoutError" ? "timeout" : "network";
+        dispatch("error", JSON.stringify({ code, message: error.message }));
+      }
     }
   });
   return source;
@@ -381,14 +429,14 @@ function createPostEventStream(url, payload) {
 function start() {
   if (state.source) return;
 
-  const email = el("email").value.trim();
-  if (!email) {
-    toast(t("enterEmail"), true);
+  const value = el("email").value.trim();
+  if (!value) {
+    toast(t(state.mode === "phone" ? "enterPhone" : "enterEmail"), true);
     el("email").focus();
     return;
   }
   state.results = [];
-  state.email = email;
+  state.email = value;
   state.activeStatuses = new Set();
   state.keyword = "";
   el("keyword").value = "";
@@ -404,12 +452,13 @@ function start() {
   setRunning(true);
 
   if (state.mode === "ai") {
-    startAi(email);
+    startAi(value);
     return;
   }
 
-  const source = createPostEventStream("/api/scan/stream", {
-    email,
+  const phoneMode = state.mode === "phone";
+  const source = createPostEventStream(phoneMode ? "/api/phone-scan/stream" : "/api/scan/stream", {
+    ...(phoneMode ? { phone: value } : { email: value }),
     consent: true,
     profile: state.scanProfile,
     only: [],
@@ -421,8 +470,14 @@ function start() {
     const data = JSON.parse(e.data);
     state.total = data.total;
     const profileLabel = (data.profile || state.scanProfile) === "full" ? t("extendedLabel") : t("reliableLabel");
-    el("progress-text").textContent = `${profileLabel} · ${t("scanning")} ${data.email}`;
+    const target = data.phone || data.email || state.email;
+    el("progress-text").textContent = `${profileLabel} · ${t("scanning")} ${target}`;
     el("progress-count").textContent = `0 / ${data.total}`;
+    if (data.total === 0) {
+      el("progress-text").textContent = t("emptyScan");
+      el("empty").textContent = t("emptyScan");
+      el("empty").hidden = false;
+    }
   });
 
   source.addEventListener("result", (e) => {
@@ -441,23 +496,44 @@ function start() {
     const summary = JSON.parse(e.data);
     el("progress-text").textContent = `${t("scanComplete")} · ${t("elapsed")} ${(summary.elapsed_ms / 1000).toFixed(1)} ${t("seconds")}`;
     el("progress-bar").style.width = "100%";
+    if (!summary.total) {
+      el("results-panel").hidden = true;
+      el("empty").textContent = t("emptyScan");
+      el("empty").hidden = false;
+    }
     stop();
     renderStats(summary);
   });
 
   source.addEventListener("error", (e) => {
-    if (e.data) {
-      try {
-        toast(localizeDetail(JSON.parse(e.data).message, "error"), true);
-      } catch {
-        toast(t("serverError"), true);
-      }
-    } else if (!state.results.length) {
-      toast(t("connectionInterrupted"), true);
-      el("progress-text").textContent = t("interrupted");
-    }
+    const payload = parseStreamError(e.data);
+    toast(formatStreamError(payload), true);
+    el("progress-text").textContent = t("interrupted");
+    el("progress-count").textContent = `${state.results.length} / ${state.total || 0}`;
     stop();
   });
+}
+
+function parseStreamError(data) {
+  if (!data) return { code: "network" };
+  try {
+    return JSON.parse(data);
+  } catch {
+    return { code: "backend_error", message: data };
+  }
+}
+
+function formatStreamError(payload) {
+  const labels = {
+    invalid_phone: "invalidPhone",
+    auth_failure: "authFailure",
+    rate_limited: "rateLimitFailure",
+    timeout: "timeoutFailure",
+    cors: "corsFailure",
+    network: "connectionInterrupted",
+  };
+  const localized = labels[payload.code] ? t(labels[payload.code]) : null;
+  return localized || payload.message || t("serverError");
 }
 
 function startAi(email) {
@@ -654,7 +730,7 @@ function stop() {
 
 function setRunning(running) {
   el("run").disabled = running;
-  const idle = state.mode === "ai" ? t("startAi") :
+  const idle = state.mode === "ai" ? t("startAi") : state.mode === "phone" ? t("startPhone") :
     state.scanProfile === "full" ? t("startExtended") : t("startQuery");
   el("run").querySelector(".btn-label").textContent = running ? t("running") : idle;
   el("stop").hidden = !running;

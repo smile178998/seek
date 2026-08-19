@@ -43,6 +43,7 @@ class Settings(BaseSettings):
 
     concurrency: int = 24
     timeout: float = 12.0
+    debug: bool = False
     user_agent: str = DEFAULT_USER_AGENT
     proxy: str | None = None
 

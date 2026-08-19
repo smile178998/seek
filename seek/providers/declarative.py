@@ -8,8 +8,8 @@ import httpx
 
 from ..config import lookup_secret
 from ..models import ProviderInfo, Result, Status
-from ..utils import TemplateError, build_context, json_path, render, render_any
-from .base import CheckContext, Provider, Timer
+from ..utils import TemplateError, build_context, build_phone_context, json_path, render, render_any
+from .base import CheckContext, PhoneCheckContext, Provider, Timer
 
 # 规则条件 -> 命中后判定的状态
 _CONDITION_TO_STATUS = {
@@ -51,20 +51,59 @@ class DeclarativeProvider(Provider):
         self.default_status = Status(spec.get("default", "unknown"))
         self.extract_spec: dict[str, str] = spec.get("extract", {}) or {}
 
+    @property
+    def supports_phone(self) -> bool:
+        return "request" in self.spec or "phone_request" in self.spec
+
     # ---------- 主流程 ----------
     async def check(self, ctx: CheckContext) -> Result:
+        if "request" not in self.spec:
+            return self.make_result(Status.SKIPPED, detail="模块仅支持 phone scans")
+        return await self._check_request(build_context(ctx.email), ctx.client, ctx.timeout)
+
+    async def check_phone(self, ctx: PhoneCheckContext) -> Result:
+        request_spec_key = "phone_request" if "phone_request" in self.spec else "request"
+        return await self._check_request(
+            build_phone_context(ctx.phone),
+            ctx.client,
+            ctx.timeout,
+            request_spec_key=request_spec_key,
+        )
+
+    async def _check_request(
+        self,
+        template_ctx: dict[str, Any],
+        client: httpx.AsyncClient,
+        timeout: float,
+        request_spec_key: str = "request",
+    ) -> Result:
         try:
             extra = self._resolve_env(self.info.requires)
         except LookupError as exc:
             return self.make_result(Status.SKIPPED, detail=str(exc))
 
-        template_ctx = build_context(ctx.email, extra)
+        template_ctx.update(extra)
+        request_spec = self.spec.get(request_spec_key, {})
+        rules = self.rules
+        default_status = self.default_status
+        default_detail = self.spec.get("default_detail")
+        if request_spec_key == "phone_request":
+            rules = _as_list(self.spec.get("phone_rules", self.rules))
+            default_status = Status(self.spec.get("phone_default", self.spec.get("default", "unknown")))
+            default_detail = self.spec.get("phone_default_detail", default_detail)
+        elif request_spec_key == "request" and "phone_request" not in self.spec:
+            default_status = Status(self.spec.get("phone_default", "unknown"))
+            default_detail = self.spec.get(
+                "phone_default_detail",
+                "Phone check used the site's email endpoint; result may be inconclusive",
+            )
 
         with Timer() as timer:
             try:
-                await self._run_prepare(ctx.client, template_ctx, ctx.timeout)
-                request = self._build_request(ctx=template_ctx)
-                response = await self._send(ctx.client, request, ctx.timeout)
+                prepare_specs = self.prepare_specs if request_spec_key == "request" else _as_list(self.spec.get("phone_prepare"))
+                await self._run_prepare(client, template_ctx, timeout, prepare_specs)
+                request = self._build_request(request_spec, template_ctx)
+                response = await self._send(client, request, timeout)
             except TemplateError as exc:
                 return self.make_result(
                     Status.ERROR,
@@ -84,13 +123,14 @@ class DeclarativeProvider(Provider):
                     Status.ERROR, elapsed_ms=timer.ms, detail=f"网络错误: {exc}"
                 )
 
-        return self._evaluate(response, timer.elapsed_ms)
+        return self._evaluate(response, timer.elapsed_ms, rules, default_status, default_detail)
 
     # ---------- 预备请求（拿 CSRF token / cookie 等） ----------
     async def _run_prepare(
-        self, client: httpx.AsyncClient, ctx: dict[str, Any], timeout: float
+        self, client: httpx.AsyncClient, ctx: dict[str, Any], timeout: float,
+        prepare_specs: list[dict[str, Any]] | None = None,
     ) -> None:
-        for index, step in enumerate(self.prepare_specs):
+        for index, step in enumerate(self.prepare_specs if prepare_specs is None else prepare_specs):
             request = self._build_request(step, ctx)
             try:
                 response = await self._send(client, request, timeout)
@@ -180,7 +220,10 @@ class DeclarativeProvider(Provider):
         )
 
     # ---------- 判定 ----------
-    def _evaluate(self, response: httpx.Response, elapsed_ms: int) -> Result:
+    def _evaluate(
+        self, response: httpx.Response, elapsed_ms: int, rules: list[dict[str, Any]],
+        default_status: Status, default_detail: str | None,
+    ) -> Result:
         text = response.text
         try:
             body_json: Any = response.json()
@@ -195,7 +238,7 @@ class DeclarativeProvider(Provider):
             "url": str(response.url),
         }
 
-        for rule in self.rules:
+        for rule in rules:
             for condition, status in _CONDITION_TO_STATUS.items():
                 if condition in rule and self._match(rule[condition], scope):
                     detail = rule.get("detail")
@@ -208,10 +251,10 @@ class DeclarativeProvider(Provider):
                     )
 
         return self.make_result(
-            self.default_status,
+            default_status,
             elapsed_ms=elapsed_ms,
             http_status=response.status_code,
-            detail=self.spec.get("default_detail"),
+            detail=default_detail,
             data=self._extract(scope),
         )
 

@@ -57,6 +57,8 @@ copy .env.example .env      # Windows
 python run.py               # http://127.0.0.1:8000
 ```
 
+手机号扫描：API 提供 `POST /api/phone-scan` 与 `POST /api/phone-scan/stream`。现有网站规则也会参与手机号扫描；如站点需要不同接口，可在 YAML 中添加优先使用的 `phone_request` 与 `phone_rules`。可用变量为 `{phone}`、`{phone_digits}`、`{phone_urlenc}`、`{phone_sha256}`。仅查询本人或已获授权的号码，很多站点会主动返回无法区分的结果。
+
 命令行：
 
 ```bash
@@ -115,6 +117,7 @@ python -m seek.cli ai you@example.com -y
 | `SEEK_CONCURRENCY` | `24` | 并发数；兼顾 100+ 模块速度与 DNS 稳定性 |
 | `SEEK_TIMEOUT` | `12` | 普通模块单次超时；User Scanner 多步模块有独立总预算（上游每次请求最多 15 秒） |
 | `SEEK_SCAN_PROFILE` | `reliable` | `reliable` 或 `full`；Web UI 默认从完整模式开始 |
+| `SEEK_DEBUG` | `false` | 开发环境设为 `true` 时，手机号流返回后端异常详情；生产环境保持 `false` |
 | `SEEK_AI_PROFILE` | `reliable` | AI 聚合档位；`full` 会跑 Holehe |
 | `SEEK_PROXY` | 空 | 代理，如 `http://127.0.0.1:7890` |
 | `SEEK_ALLOWED_DOMAINS` | 空 | 允许查询的邮箱域名（逗号分隔） |

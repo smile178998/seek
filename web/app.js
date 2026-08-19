@@ -197,7 +197,7 @@ const state = {
   email: "",
   total: 0,
   mode: "scan", // scan | ai
-  scanProfile: "reliable", // reliable | full
+  scanProfile: "full", // reliable | full
   aiConfigured: false,
   aiMeta: null,
   lang: localStorage.getItem("seek-language") === "en" ? "en" : "zh",

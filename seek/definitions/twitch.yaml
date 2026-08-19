@@ -1,0 +1,18 @@
+name: twitch
+title: Twitch
+category: media
+homepage: https://www.twitch.tv
+description: Public login page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://www.twitch.tv/login"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

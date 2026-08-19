@@ -1,0 +1,18 @@
+name: bandcamp
+title: Bandcamp
+category: music
+homepage: https://bandcamp.com
+description: Public login page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://bandcamp.com/login"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

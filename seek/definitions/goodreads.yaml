@@ -1,0 +1,18 @@
+name: goodreads
+title: Goodreads
+category: media
+homepage: https://www.goodreads.com
+description: Public sign-in page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://www.goodreads.com/user/sign_in"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

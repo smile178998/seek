@@ -1,0 +1,18 @@
+name: patreon_creator
+title: Patreon Creator
+category: crowdfunding
+homepage: https://www.patreon.com
+description: Public login page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://www.patreon.com/login"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

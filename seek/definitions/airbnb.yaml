@@ -1,0 +1,18 @@
+name: airbnb
+title: Airbnb
+category: travel
+homepage: https://www.airbnb.com
+description: Public sign-in endpoint probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://www.airbnb.com/login"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

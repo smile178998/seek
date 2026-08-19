@@ -1,0 +1,18 @@
+name: steam
+title: Steam
+category: gaming
+homepage: https://store.steampowered.com
+description: Public login page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://store.steampowered.com/login/"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

@@ -1,0 +1,18 @@
+name: notion
+title: Notion
+category: other
+homepage: https://www.notion.so
+description: Public login page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://www.notion.so/login"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

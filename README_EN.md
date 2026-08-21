@@ -112,7 +112,7 @@ Copy `.env.example` to `.env` and edit as needed:
 | `SEEK_HOST` / `SEEK_PORT` | `127.0.0.1` / `8000` | Listen address |
 | `SEEK_CONCURRENCY` | `24` | Concurrent requests; balances 100+ module speed and DNS stability |
 | `SEEK_TIMEOUT` | `12` | Native-rule timeout; multi-step User Scanner checks get a separate whole-check budget (upstream allows 15 seconds per request) |
-| `SEEK_SCAN_PROFILE` | `reliable` | `reliable` or `full` |
+| `SEEK_SCAN_PROFILE` | `reliable` | `reliable` or `full`; the Web UI starts in full mode |
 | `SEEK_AI_PROFILE` | `reliable` | AI aggregation profile; `full` includes Holehe |
 | `SEEK_PROXY` | empty | Proxy, e.g. `http://127.0.0.1:7890` |
 | `SEEK_ALLOWED_DOMAINS` | empty | Allowed email domains (comma-separated) |

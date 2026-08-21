@@ -1,0 +1,18 @@
+name: ea
+title: EA
+category: gaming
+homepage: https://www.ea.com
+description: Public account page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://signin.ea.com/p/originX/login"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

@@ -1,0 +1,18 @@
+name: udemy
+title: Udemy
+category: edu
+homepage: https://www.udemy.com
+description: Public login page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://www.udemy.com/join/login-popup/"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

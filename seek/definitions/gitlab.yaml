@@ -1,0 +1,18 @@
+name: gitlab
+title: GitLab
+category: dev
+homepage: https://gitlab.com
+description: Public sign-in page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://gitlab.com/users/sign_in"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

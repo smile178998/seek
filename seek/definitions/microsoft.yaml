@@ -1,0 +1,18 @@
+name: microsoft
+title: Microsoft Account
+category: mail
+homepage: https://account.microsoft.com
+description: Public sign-in page probe
+notes: Candidate rule; endpoint behavior may change.
+
+request:
+  method: GET
+  url: "https://login.live.com/login.srf"
+  headers:
+    Accept: "text/html"
+
+rules:
+  - rate_limited_if:
+      status_in: [403, 429]
+
+default: unknown

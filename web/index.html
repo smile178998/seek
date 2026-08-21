@@ -5,21 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Seek · 邮箱注册痕迹反查</title>
-  <link rel="stylesheet" href="/static/style.css?v=20260816-1" />
+  <link rel="stylesheet" href="/static/style.css?v=20260821-1" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔎</text></svg>" />
 </head>
 <body>
-  <div class="glow glow-a"></div>
-  <div class="glow glow-b"></div>
-
   <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark">Seek</span>
-      <span class="brand-sub" data-i18n="brandSubtitle">邮箱注册痕迹反查</span>
-    </div>
-    <div class="topbar-meta">
-      <button id="language-toggle" type="button" class="pill language-toggle" aria-label="Switch to English">English</button>
-      <a class="pill pill-link" href="/docs" target="_blank" rel="noreferrer" data-i18n="apiDocs">API 文档</a>
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="Seek 首页">
+        <span class="brand-mark">SEEK</span>
+        <span class="brand-sub" data-i18n="brandSubtitle">邮箱注册痕迹反查</span>
+      </a>
+
+      <div class="header-search">
+        <div class="search-row">
+          <div class="input-shell">
+            <svg viewBox="0 0 24 24" class="input-icon" aria-hidden="true">
+              <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <input id="email" type="email" placeholder="somebody@example.com" autocomplete="off"
+                   spellcheck="false" />
+          </div>
+          <button id="run" class="btn btn-primary">
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.6"></circle>
+              <path d="m16 16 4.4 4.4"></path>
+            </svg>
+            <span class="btn-label" data-i18n="startQuery">开始查询</span>
+          </button>
+          <button id="stop" class="btn btn-ghost" hidden data-i18n="stop">停止</button>
+        </div>
+      </div>
+
+      <div class="topbar-meta">
+        <button id="language-toggle" type="button" class="pill language-toggle" aria-label="Switch to English">English</button>
+        <a class="pill pill-link" href="/docs" target="_blank" rel="noreferrer" data-i18n="apiDocs">API 文档</a>
+      </div>
     </div>
   </header>
 
@@ -31,22 +52,6 @@
         <button type="button" class="mode-chip" data-mode="ai" id="mode-ai" data-i18n="aiSummaryMode">AI 可靠汇总</button>
         <span id="mode-status" class="mode-hint" data-i18n="reliableHint">可靠扫描：仅运行已验证站点，速度更快</span>
       </div>
-
-      <div class="search-row">
-        <div class="input-shell">
-          <svg viewBox="0 0 24 24" class="input-icon" aria-hidden="true">
-            <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.6"/>
-            <path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6"/>
-          </svg>
-          <input id="email" type="email" placeholder="somebody@example.com" autocomplete="off"
-                 spellcheck="false" />
-        </div>
-        <button id="run" class="btn btn-primary">
-          <span class="btn-label" data-i18n="startQuery">开始查询</span>
-        </button>
-        <button id="stop" class="btn btn-ghost" hidden data-i18n="stop">停止</button>
-      </div>
-
     </section>
 
     <section id="progress-panel" class="panel progress-panel" hidden>
@@ -109,6 +114,6 @@
     </section>
   </main>
 
-  <script src="/static/app.js?v=20260816-1"></script>
+  <script src="/static/app.js?v=20260821-1"></script>
 </body>
 </html>

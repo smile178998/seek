@@ -39,6 +39,7 @@ class ProviderInfo(BaseModel):
     enabled: bool = True
     ready: bool = True
     unready_reason: str | None = None
+    verified: bool = False
 
 
 class Result(BaseModel):

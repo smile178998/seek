@@ -197,7 +197,7 @@ const state = {
   email: "",
   total: 0,
   mode: "scan", // scan | ai
-  scanProfile: "full", // reliable | full
+  scanProfile: "reliable", // reliable | full
   aiConfigured: false,
   aiMeta: null,
   lang: localStorage.getItem("seek-language") === "en" ? "en" : "zh",
@@ -726,29 +726,7 @@ function rowNode(r) {
   const row = document.createElement("div");
   row.className = "row";
 
-  const badge = document.createElement("span");
-  badge.className = `badge ${r.status}`;
-  badge.textContent = STATUS_LABEL[r.status] || r.status;
-  row.appendChild(badge);
-
-  const avatarUrl = safeHttpUrl(r.data && r.data.avatar_url);
-  if (avatarUrl) {
-    const avatarLink = document.createElement("a");
-    avatarLink.className = "row-avatar-link";
-    avatarLink.href = avatarUrl;
-    avatarLink.target = "_blank";
-    avatarLink.rel = "noreferrer noopener";
-    avatarLink.title = t("viewPublicAvatar");
-    const avatar = document.createElement("img");
-    avatar.className = "row-avatar";
-    avatar.src = avatarUrl;
-    avatar.alt = `${localizeTitle(r.title)} avatar`;
-    avatar.loading = "lazy";
-    avatar.referrerPolicy = "no-referrer";
-    avatar.addEventListener("error", () => avatarLink.remove());
-    avatarLink.appendChild(avatar);
-    row.appendChild(avatarLink);
-  }
+  row.appendChild(siteVisualNode(r));
 
   const main = document.createElement("div");
   main.className = "row-main";
@@ -772,6 +750,25 @@ function rowNode(r) {
   tag.className = "tag";
   tag.textContent = CATEGORY_LABEL[r.category] || r.category;
   title.appendChild(tag);
+
+  const avatarUrl = safeHttpUrl(r.data && r.data.avatar_url);
+  if (avatarUrl) {
+    const avatarLink = document.createElement("a");
+    avatarLink.className = "profile-avatar-link";
+    avatarLink.href = avatarUrl;
+    avatarLink.target = "_blank";
+    avatarLink.rel = "noreferrer noopener";
+    avatarLink.title = t("viewPublicAvatar");
+    const avatar = document.createElement("img");
+    avatar.className = "profile-avatar";
+    avatar.src = avatarUrl;
+    avatar.alt = `${localizeTitle(r.title)} avatar`;
+    avatar.loading = "lazy";
+    avatar.referrerPolicy = "no-referrer";
+    avatar.addEventListener("error", () => avatarLink.remove());
+    avatarLink.appendChild(avatar);
+    title.appendChild(avatarLink);
+  }
   main.appendChild(title);
 
   if (r.detail) {
@@ -808,6 +805,80 @@ function rowNode(r) {
   row.appendChild(meta);
 
   return row;
+}
+
+function siteVisualNode(result) {
+  const visual = document.createElement("div");
+  visual.className = "site-visual";
+
+  const homepageUrl = safeHttpUrl(result.homepage);
+  const iconLink = document.createElement(homepageUrl ? "a" : "div");
+  iconLink.className = "site-icon-link";
+  if (homepageUrl) {
+    iconLink.href = homepageUrl;
+    iconLink.target = "_blank";
+    iconLink.rel = "noreferrer noopener";
+  }
+
+  const fallback = document.createElement("span");
+  fallback.className = "site-icon-fallback";
+  fallback.textContent = siteInitials(localizeTitle(result.title));
+  iconLink.appendChild(fallback);
+
+  const candidates = siteIconCandidates(homepageUrl);
+  if (candidates.length) {
+    const icon = document.createElement("img");
+    icon.className = "site-icon";
+    icon.alt = localizeTitle(result.title);
+    icon.loading = "lazy";
+    icon.referrerPolicy = "no-referrer";
+    let candidateIndex = 0;
+    const tryNext = () => {
+      if (candidateIndex >= candidates.length) {
+        icon.remove();
+        return;
+      }
+      icon.src = candidates[candidateIndex++];
+    };
+    icon.addEventListener("load", () => visual.classList.add("icon-loaded"));
+    icon.addEventListener("error", () => {
+      visual.classList.remove("icon-loaded");
+      tryNext();
+    });
+    tryNext();
+    iconLink.appendChild(icon);
+  }
+
+  const status = document.createElement("span");
+  status.className = `site-status ${result.status}`;
+  status.textContent = STATUS_LABEL[result.status] || result.status;
+  visual.append(iconLink, status);
+  return visual;
+}
+
+function siteIconCandidates(homepage) {
+  const url = safeHttpUrl(homepage);
+  if (!url) return [];
+  try {
+    const parsed = new URL(url);
+    const direct = new URL("/favicon.ico", parsed.origin).href;
+    const duckduckgo = `https://icons.duckduckgo.com/ip3/${encodeURIComponent(parsed.hostname)}.ico`;
+    const google = `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(parsed.origin)}&sz=128`;
+    return [direct, duckduckgo, google];
+  } catch {
+    return [];
+  }
+}
+
+function siteInitials(title) {
+  const words = String(title || "?")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!words.length) return "?";
+  if (words.length === 1) return Array.from(words[0]).slice(0, 2).join("").toUpperCase();
+  return `${Array.from(words[0])[0]}${Array.from(words[1])[0]}`.toUpperCase();
 }
 
 function safeHttpUrl(value) {

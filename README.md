@@ -63,7 +63,10 @@ python run.py               # http://127.0.0.1:8000
 python -m seek.cli providers                 # 查看模块
 python -m seek.cli scan me@example.com       # 扫描
 python -m seek.cli scan me@example.com -y --json
+python -m seek.cli audit-providers --output provider-audit.json
 ```
+
+`audit-providers` 会用两个随机负样本复检可靠模式；不会使用你的目标邮箱，也不会加载会发送重置邮件或验证码的模块。可靠模式中的“已注册”结果还必须连续两次得到相同结论，否则自动降级为“无法判定”。
 
 ---
 

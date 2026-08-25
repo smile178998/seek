@@ -7,6 +7,7 @@ pydantic-settings==2.7.1
 python-dotenv==1.2.2
 PyYAML==6.0.2
 typer==0.15.1
+click==8.1.8
 rich==13.9.4
 dnspython==2.7.0
 email-validator==2.2.0

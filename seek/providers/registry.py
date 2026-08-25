@@ -117,6 +117,12 @@ def load_providers(
             ]
             log.info("可靠模式：%d/%d 个模块", len(providers), before)
 
+    if profile == "reliable":
+        # Only live-audited providers are marked for positive confirmation.
+        # Full-profile providers intentionally remain unverified.
+        for provider in providers:
+            provider.info.verified = True
+
     providers.sort(key=lambda p: (p.info.category, p.info.name))
     return providers
 

@@ -85,9 +85,42 @@ class Engine:
 
         async def execute(provider: Provider) -> Result:
             try:
-                check_task = asyncio.create_task(provider.check(ctx))
+                async def check_with_positive_confirmation() -> Result:
+                    first = await provider.check(ctx)
+                    if (
+                        first.status is not Status.REGISTERED
+                        or not provider.info.verified
+                    ):
+                        return first
+
+                    confirmation = await provider.check(ctx)
+                    first.elapsed_ms += confirmation.elapsed_ms
+                    if confirmation.status is Status.REGISTERED:
+                        first.data = {
+                            **first.data,
+                            "positive_confirmed": True,
+                            "verification_attempts": 2,
+                        }
+                        return first
+
+                    first.status = Status.UNKNOWN
+                    first.detail = (
+                        "Positive signal was not repeatable; result downgraded "
+                        f"({confirmation.status.value})"
+                    )
+                    first.data = {
+                        "positive_confirmed": False,
+                        "verification_attempts": 2,
+                        "confirmation_status": confirmation.status.value,
+                    }
+                    return first
+
+                check_task = asyncio.create_task(check_with_positive_confirmation())
+                timeout_budget = provider.execution_timeout(ctx)
+                if provider.info.verified:
+                    timeout_budget *= 2
                 done, _ = await asyncio.wait(
-                    {check_task}, timeout=provider.execution_timeout(ctx)
+                    {check_task}, timeout=timeout_budget
                 )
                 if not done:
                     detach(check_task)

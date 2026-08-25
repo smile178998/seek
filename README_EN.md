@@ -61,7 +61,10 @@ CLI:
 python -m seek.cli providers                 # list modules
 python -m seek.cli scan me@example.com       # scan
 python -m seek.cli scan me@example.com -y --json
+python -m seek.cli audit-providers --output provider-audit.json
 ```
+
+`audit-providers` rechecks the reliable profile with two random negative controls. It never uses the target email and never loads modules that send password-reset messages or login codes. A positive result in reliable mode must also be returned twice; inconsistent results are downgraded to unknown.
 
 ---
 

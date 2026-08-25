@@ -272,6 +272,7 @@ def test_user_scanner_curated_modules_load_and_map_status():
     from seek.config import Settings
     from seek.models import Status
     from seek.providers.user_scanner_bridge import (
+        SIDE_EFFECTFUL_MODULES,
         _map_status,
         _normalize_profile_data,
         load_user_scanner_providers,
@@ -284,8 +285,17 @@ def test_user_scanner_curated_modules_load_and_map_status():
     assert "userscanner_huggingface" in names
     assert "userscanner_pornhub" in names
     assert "userscanner_xvideos" in names
+    assert "userscanner_patreon" in names
+    assert "userscanner_eventbrite" in names
+    assert "userscanner_amazon" in names
+    assert "userscanner_x" in names
     assert "userscanner_made_porn" not in names
     assert "userscanner_babestation" not in names
+    assert "userscanner_gumroad" not in names
+    assert "userscanner_anilist" not in names
+    assert not {
+        f"userscanner_{entry.split('/', 1)[1]}" for entry in SIDE_EFFECTFUL_MODULES
+    } & names
     assert _map_status("TAKEN", "") is Status.REGISTERED
     assert _map_status("AVAILABLE", "") is Status.NOT_REGISTERED
     assert _map_status(
@@ -312,6 +322,24 @@ def test_user_scanner_validator_aliases_cover_known_upstream_mismatch():
     from seek.providers.user_scanner_bridge import VALIDATOR_ALIASES
 
     assert VALIDATOR_ALIASES["sports/besoccer"] == "validate_okcats"
+
+
+def test_side_effectful_user_scanner_modules_are_blocked_even_if_curated():
+    from tempfile import TemporaryDirectory
+
+    from seek.providers.user_scanner_bridge import load_user_scanner_providers
+
+    with TemporaryDirectory() as directory:
+        module_file = Path(directory) / "modules.txt"
+        module_file.write_text(
+            "creator/gumroad\nentertainment/hoichoi\ncommunity/disqus\n",
+            encoding="utf-8",
+        )
+        names = {
+            provider.info.name
+            for provider in load_user_scanner_providers(module_file)
+        }
+    assert names == {"userscanner_disqus"}
 
 
 def test_transient_network_error_is_retried_once():
@@ -343,6 +371,42 @@ def test_transient_network_error_is_retried_once():
     assert response.summary.not_registered == 1
     assert response.summary.error == 0
     print("[ok] transient network failures receive one low-concurrency retry")
+
+
+def test_reliable_positive_result_requires_repeat_confirmation():
+    from seek.config import Settings
+    from seek.models import ProviderInfo
+    from seek.providers.base import Provider
+
+    class PositiveProvider(Provider):
+        def __init__(self, statuses):
+            super().__init__(
+                ProviderInfo(name="positive", title="Positive", verified=True)
+            )
+            self.statuses = list(statuses)
+            self.calls = 0
+
+        async def check(self, ctx):
+            status = self.statuses[min(self.calls, len(self.statuses) - 1)]
+            self.calls += 1
+            return self.make_result(status)
+
+    async def go(provider):
+        settings = Settings(concurrency=1, timeout=0.1)
+        async with Engine([provider], settings=settings) as engine:
+            return await engine.scan(EMAIL)
+
+    stable = PositiveProvider([Status.REGISTERED, Status.REGISTERED])
+    stable_response = asyncio.run(go(stable))
+    assert stable.calls == 2
+    assert stable_response.results[0].status is Status.REGISTERED
+    assert stable_response.results[0].data["positive_confirmed"] is True
+
+    unstable = PositiveProvider([Status.REGISTERED, Status.NOT_REGISTERED])
+    unstable_response = asyncio.run(go(unstable))
+    assert unstable.calls == 2
+    assert unstable_response.results[0].status is Status.UNKNOWN
+    assert unstable_response.results[0].data["positive_confirmed"] is False
 
 
 def test_chinese_site_rules_map_only_explicit_signals():

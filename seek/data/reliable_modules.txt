@@ -13,7 +13,6 @@ gravatar_profile
 # 站点（实测有明确判定信号）
 duolingo
 spotify
-twitter
 wordpress
 mailru
 anydo
@@ -38,7 +37,6 @@ holehe_mybb
 holehe_seoclerks
 holehe_laposte
 holehe_mail_ru
-holehe_rambler
 holehe_sporcle
 holehe_blip
 holehe_xvideos

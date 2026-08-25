@@ -59,6 +59,39 @@ VALIDATOR_ALIASES = {
     "sports/besoccer": "validate_okcats",
 }
 
+# These upstream modules trigger password-reset, login-code, username-reminder,
+# or signup-OTP delivery.  They must never be loaded by seek's quiet scanner,
+# even if somebody accidentally adds them to the curated module file later.
+# The list was reviewed against user-scanner 1.5.0 on 2026-08-25.
+SIDE_EFFECTFUL_MODULES = frozenset(
+    {
+        "adult/babestation",
+        "adult/fantasia",
+        "adult/flirtbate",
+        "adult/made_porn",
+        "adult/sexvid",
+        "creator/buymeacoffee",
+        "creator/gumroad",
+        "dev/luarocks",
+        "entertainment/anilist",
+        "entertainment/hoichoi",
+        "fitness/finch",
+        "learning/asafeer",
+        "learning/bnrlanguages",
+        "learning/bunpo",
+        "learning/hellochinese",
+        "learning/hanzii",
+        "learning/heyjapan",
+        "learning/programminghub",
+        "learning/talkpal",
+        "other/ama",
+        "other/dragongroot",
+        "social/couplejoy",
+        "social/slowly",
+        "sports/uniscore",
+    }
+)
+
 
 def user_scanner_available() -> bool:
     try:
@@ -195,6 +228,9 @@ def load_user_scanner_providers(module_file: Path) -> list[Provider]:
     for raw_line in module_file.read_text(encoding="utf-8").splitlines():
         entry = raw_line.strip()
         if not entry or entry.startswith("#"):
+            continue
+        if entry in SIDE_EFFECTFUL_MODULES:
+            log.warning("skipping side-effectful user-scanner module: %s", entry)
             continue
         try:
             category, module_name = entry.split("/", 1)

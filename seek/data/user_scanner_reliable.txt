@@ -1,10 +1,9 @@
-# user-scanner 1.5.0 modules that passed live checks with both random
-# example.com and gmail.com negative controls on 2026-08-14.
+# user-scanner 1.5.0 modules that passed two live negative controls.
+# Revalidated with random gmail.com and outlook.com addresses on 2026-08-25.
+# Password-reset, OTP, login-code and username-reminder modules are forbidden
+# by SIDE_EFFECTFUL_MODULES in user_scanner_bridge.py, even if listed here.
 community/disqus
 community/nextdoor
-creator/buymeacoffee
-creator/gumroad
-creator/vimeo
 crm/hubspot
 crm/zoho
 dev/codewars
@@ -13,32 +12,25 @@ dev/hackerrank
 dev/hackthebox
 dev/howtogeek
 dev/huggingface
-dev/luarocks
 dev/qiita
 dev/rubygems
 dev/wix
 dev/wondershare
 dev/xda
-entertainment/anilist
 entertainment/appletv
-entertainment/hoichoi
 entertainment/justwatch
 entertainment/nebula_tv
 entertainment/stremio
 entertainment/sunnxt
-fitness/finch
 fitness/fitnessblender
 fitness/myfitnesspal
 gaming/addictinggames
 gaming/crazygames
-gaming/stackb
 hosting/bunny
 hosting/neocities
 learning/alison
 learning/babbel
 learning/coursera
-learning/hellochinese
-learning/talkpal
 learning/vedantu
 music/deezer
 music/gaana
@@ -53,7 +45,6 @@ news/globaltimes
 news/indiatimes
 other/dropbox
 other/moz
-other/office365
 other/screener
 shopping/etsy
 shopping/fixderma
@@ -61,22 +52,18 @@ shopping/hautesauce
 shopping/rappi
 shopping/tatacliq
 shopping/walmart
-social/couplejoy
 social/facebook
 social/locket
 social/lovenudge
 social/mastodon
 social/meeff
 social/mewe
-social/slowly
 social/whering
 sports/aiscore
 sports/espn
 sports/marca
 sports/nba
 sports/playtomic
-sports/uniscore
-travel/polarsteps
 travel/skyscanner
 women_health/femometer
 women_health/glow
@@ -85,8 +72,7 @@ women_health/meetyou
 women_health/myperiodtracker
 women_health/premom
 
-# Added after two-domain negative-control checks on 2026-08-15.
-# Password-reset / OTP-sending modules are intentionally excluded.
+# Revalidated on 2026-08-25.
 adult/faproulette
 adult/pornhub
 adult/thegay
@@ -100,7 +86,6 @@ entertainment/myanimelist
 gaming/chess_com
 jobs/freelancer
 learning/annaabi
-learning/asafeer
 learning/cakeapp
 other/dollarfix
 other/firefox
@@ -108,6 +93,32 @@ other/numsify
 shopping/vivino
 social/instagram
 social/pinterest
-social/tumblr
 sports/besoccer
 travel/komoot
+
+# Added after two-domain negative-control checks on 2026-08-25.
+adult/fapfolder
+adult/letsporn
+adult/lovescape
+adult/redtube
+adult/superporn
+adult/tube8
+creator/flickr
+creator/patreon
+crm/axonaut
+crm/insightly
+dev/devrant
+dev/hackerearth
+dev/wordpress
+learning/allen
+learning/duolingo
+music/spotify
+other/anydo
+other/eventbrite
+shopping/amazon
+shopping/flipkart
+shopping/naturabuy
+shopping/nykaaman
+social/gravatar
+social/plurk
+social/x

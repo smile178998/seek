@@ -54,6 +54,38 @@ def cmd_providers() -> None:
     console.print(table)
 
 
+@app.command("audit-providers")
+def cmd_audit_providers(
+    output: Optional[Path] = typer.Option(
+        None, "--output", "-o", help="Write the complete audit report to JSON"
+    ),
+    as_json: bool = typer.Option(False, "--json", help="Print the report as JSON"),
+) -> None:
+    """Live-audit reliable providers with two random negative controls."""
+
+    from .provider_audit import audit_reliable_providers
+
+    report = asyncio.run(audit_reliable_providers())
+    serialized = json.dumps(report, ensure_ascii=False, indent=2)
+    if output:
+        output.write_text(serialized + "\n", encoding="utf-8")
+        console.print(f"[green]Audit report written to {output}[/]")
+    if as_json:
+        console.print_json(serialized)
+    else:
+        console.print(
+            f"Reliable provider audit: [green]{len(report['passed'])} passed[/] / "
+            f"[bold]{report['total']} total[/]"
+        )
+        for item in report["failed"]:
+            statuses = ", ".join(
+                str(row.get("status")) for row in item["observations"]
+            )
+            console.print(f"[red]FAIL[/] {item['provider']}: {statuses}")
+    if report["failed"]:
+        raise typer.Exit(1)
+
+
 @app.command("scan")
 def cmd_scan(
     email: str = typer.Argument(..., help="要查询的邮箱"),

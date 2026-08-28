@@ -1,0 +1,782 @@
+{
+  "audited_at": "2026-08-27T19:10:30.636130+00:00",
+  "method": "read-only Discourse check_email endpoint with two random negative controls; requires public hide_email_address_taken=false",
+  "passed": [
+    {
+      "name": "koishi_forum",
+      "title": "Koishi 论坛",
+      "homepage": "https://forum.koishi.xyz",
+      "passed": true,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.koishi.xyz",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.koishi.xyz",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "bananapi_forum",
+      "title": "Banana Pi Forum",
+      "homepage": "https://forum.banana-pi.org",
+      "passed": true,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.banana-pi.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.banana-pi.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "arducam_forum",
+      "title": "Arducam 技术支持论坛",
+      "homepage": "https://forum.arducam.com",
+      "passed": true,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.arducam.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.arducam.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "aqara_forum",
+      "title": "Aqara Forum",
+      "homepage": "https://forum.aqara.com",
+      "passed": true,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.aqara.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.aqara.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "fit2cloud_forum",
+      "title": "飞致云社区",
+      "homepage": "https://bbs.fit2cloud.com",
+      "passed": true,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "bbs.fit2cloud.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "bbs.fit2cloud.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    }
+  ],
+  "failed": [
+    {
+      "name": "discoze_community",
+      "title": "Discoze 中文社区",
+      "homepage": "https://www.discoze.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "error": "ConnectTimeout: "
+        },
+        {
+          "email_domain": "outlook.com",
+          "error": "ConnectTimeout: "
+        }
+      ]
+    },
+    {
+      "name": "linux_do",
+      "title": "LINUX DO",
+      "homepage": "https://linux.do",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 403,
+          "final_host": "linux.do",
+          "success": null,
+          "body": "<html dir=\"ltr\"> <head>     <title>Just a moment...</title>     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">     <meta name=\"viewport\" content=\"width=device-"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 403,
+          "final_host": "linux.do",
+          "success": null,
+          "body": "<html dir=\"ltr\"> <head>     <title>Just a moment...</title>     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">     <meta name=\"viewport\" content=\"width=device-"
+        }
+      ]
+    },
+    {
+      "name": "isharkfly_community",
+      "title": "iSharkFly 飞鲨社区",
+      "homepage": "https://www.isharkfly.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "www.isharkfly.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "www.isharkfly.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "nodeloc_community",
+      "title": "NodeLoc",
+      "homepage": "https://www.nodeloc.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "www.nodeloc.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "www.nodeloc.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "justnainai_community",
+      "title": "宅宅的妙妙屋",
+      "homepage": "https://www.justnainai.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "www.justnainai.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "www.justnainai.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "idcflare_community",
+      "title": "IDC Flare",
+      "homepage": "https://idcflare.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 403,
+          "final_host": "idcflare.com",
+          "success": null,
+          "body": "<html dir=\"ltr\"> <head>     <title>Just a moment...</title>     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">     <meta name=\"viewport\" content=\"width=device-"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 403,
+          "final_host": "idcflare.com",
+          "success": null,
+          "body": "<html dir=\"ltr\"> <head>     <title>Just a moment...</title>     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">     <meta name=\"viewport\" content=\"width=device-"
+        }
+      ]
+    },
+    {
+      "name": "trae_community",
+      "title": "TRAE 官方中文社区",
+      "homepage": "https://forum.trae.cn",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.trae.cn",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.trae.cn",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "cax_forum",
+      "title": "CAX Forum",
+      "homepage": "https://www.cax.do",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "www.cax.do",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "www.cax.do",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "freemdict_forum",
+      "title": "FreeMdict Forum",
+      "homepage": "https://forum.freemdict.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.freemdict.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.freemdict.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "quectel_chinese_forum",
+      "title": "移远中文支持社区",
+      "homepage": "https://forumschinese.quectel.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forumschinese.quectel.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forumschinese.quectel.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "tidb_forum",
+      "title": "TiDB 社区论坛",
+      "homepage": "https://ask.pingcap.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "error": "ConnectTimeout: "
+        },
+        {
+          "email_domain": "outlook.com",
+          "error": "ConnectTimeout: "
+        }
+      ]
+    },
+    {
+      "name": "deepseek_club",
+      "title": "深求社区",
+      "homepage": "https://deepseek.club",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "deepseek.club",
+          "success": null,
+          "body": "<!doctype html>  <html lang=\"zh-CN\">      <head>      <meta charset=\"UTF-8\" />      <meta        name=\"viewport\"        content=\"width=device-width, initial-scale=1.0, viewport-fit"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "deepseek.club",
+          "success": null,
+          "body": "<!doctype html>  <html lang=\"zh-CN\">      <head>      <meta charset=\"UTF-8\" />      <meta        name=\"viewport\"        content=\"width=device-width, initial-scale=1.0, viewport-fit"
+        }
+      ]
+    },
+    {
+      "name": "iosre_forum",
+      "title": "睿论坛",
+      "homepage": "https://iosre.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "iosre.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "iosre.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "akarinliu_forum",
+      "title": "阿卡林刘の论坛",
+      "homepage": "https://forum.akarinliu.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.akarinliu.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.akarinliu.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "niege_meta",
+      "title": "NieGe Meta",
+      "homepage": "https://niege.app",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "niege.app",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "niege.app",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "qingju_community",
+      "title": "青橘社区",
+      "homepage": "https://qingju.cyou",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "qingju.cyou",
+          "success": null,
+          "body": "<!-- 670570269577 --> <!DOCTYPE html> <html lang=\"en\"> <head>     <meta charset=\"utf-8\">     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">     <meta name=\"ro"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "qingju.cyou",
+          "success": null,
+          "body": "<!-- 333255033862 --> <!DOCTYPE html> <html lang=\"en\"> <head>     <meta charset=\"utf-8\">     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">     <meta name=\"ro"
+        }
+      ]
+    },
+    {
+      "name": "seeedstudio_forum",
+      "title": "Seeed Studio Forum",
+      "homepage": "https://forum.seeedstudio.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.seeedstudio.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.seeedstudio.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "khadas_forum",
+      "title": "Khadas Community",
+      "homepage": "https://forum.khadas.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.khadas.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.khadas.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "radxa_forum",
+      "title": "Radxa Community",
+      "homepage": "https://forum.radxa.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.radxa.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.radxa.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "glinet_forum",
+      "title": "GL.iNet 官方论坛",
+      "homepage": "https://forum.gl-inet.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.gl-inet.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.gl-inet.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "clockworkpi_forum",
+      "title": "ClockworkPi 社区",
+      "homepage": "https://forum.clockworkpi.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.clockworkpi.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.clockworkpi.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "luckfox_forum",
+      "title": "Luckfox Forum",
+      "homepage": "https://forum.luckfox.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "error": "ConnectError: [Errno 11001] getaddrinfo failed"
+        },
+        {
+          "email_domain": "outlook.com",
+          "error": "ConnectError: [Errno 11001] getaddrinfo failed"
+        }
+      ]
+    },
+    {
+      "name": "youyeetoo_forum",
+      "title": "Youyeetoo Forum",
+      "homepage": "https://forum.youyeetoo.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.youyeetoo.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.youyeetoo.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "chuwi_forum",
+      "title": "CHUWI 官方论坛",
+      "homepage": "https://forum.chuwi.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.chuwi.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.chuwi.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "seafile_forum",
+      "title": "Seafile 社区论坛",
+      "homepage": "https://forum.seafile.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.seafile.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.seafile.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "zimaspace_community",
+      "title": "冰鲸科技社区",
+      "homepage": "https://community.zimaspace.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.zimaspace.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.zimaspace.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "appinn_forum",
+      "title": "小众软件社区",
+      "homepage": "https://meta.appinn.net",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "meta.appinn.net",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "meta.appinn.net",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "openeuler_forum",
+      "title": "openEuler 论坛",
+      "homepage": "https://forum.openeuler.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.openeuler.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.openeuler.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    }
+  ]
+}

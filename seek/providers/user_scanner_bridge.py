@@ -35,6 +35,7 @@ CATEGORY_MAP = {
     "community": "forum",
     "creator": "profile",
     "crm": "crm",
+    "dating": "dating",
     "dev": "dev",
     "entertainment": "media",
     "fitness": "sport",
@@ -62,7 +63,7 @@ VALIDATOR_ALIASES = {
 # These upstream modules trigger password-reset, login-code, username-reminder,
 # or signup-OTP delivery.  They must never be loaded by seek's quiet scanner,
 # even if somebody accidentally adds them to the curated module file later.
-# The list was reviewed against user-scanner 1.5.0 on 2026-08-25.
+# The list was reviewed against user-scanner 1.5.0.2 on 2026-08-28.
 SIDE_EFFECTFUL_MODULES = frozenset(
     {
         "adult/babestation",
@@ -75,10 +76,12 @@ SIDE_EFFECTFUL_MODULES = frozenset(
         "dev/luarocks",
         "entertainment/anilist",
         "entertainment/hoichoi",
+        "entertainment/weverse",
         "fitness/finch",
         "learning/asafeer",
         "learning/bnrlanguages",
         "learning/bunpo",
+        "learning/cambly",
         "learning/hellochinese",
         "learning/hanzii",
         "learning/heyjapan",
@@ -88,6 +91,7 @@ SIDE_EFFECTFUL_MODULES = frozenset(
         "other/dragongroot",
         "social/couplejoy",
         "social/slowly",
+        "social/superlive",
         "sports/uniscore",
     }
 )
@@ -216,28 +220,68 @@ class UserScannerProvider(Provider):
         return result
 
 
-def load_user_scanner_providers(module_file: Path) -> list[Provider]:
-    if not user_scanner_available():
-        log.info("user-scanner is not installed; skipping its curated modules")
+def discover_user_scanner_entries() -> list[str]:
+    """Return every email module shipped by the installed upstream package."""
+    try:
+        import user_scanner
+    except Exception:
         return []
+
+    root = Path(user_scanner.__file__).resolve().parent / "email_scan"
+    return sorted(
+        f"{path.parent.name}/{path.stem}"
+        for path in root.glob("*/*.py")
+        if path.name != "__init__.py"
+    )
+
+
+def _curated_entries(module_file: Path) -> list[str]:
     if not module_file.exists():
         log.warning("user-scanner module list does not exist: %s", module_file)
         return []
+    return [
+        line.strip()
+        for line in module_file.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+
+
+def load_user_scanner_providers(
+    module_file: Path, *, include_all: bool = False
+) -> list[Provider]:
+    if not user_scanner_available():
+        log.info("user-scanner is not installed; skipping its modules")
+        return []
+
+    curated = set(_curated_entries(module_file))
+    entries = set(curated)
+    if include_all:
+        entries.update(discover_user_scanner_entries())
 
     providers: list[Provider] = []
-    for raw_line in module_file.read_text(encoding="utf-8").splitlines():
-        entry = raw_line.strip()
-        if not entry or entry.startswith("#"):
-            continue
+    for entry in sorted(entries):
         if entry in SIDE_EFFECTFUL_MODULES:
-            log.warning("skipping side-effectful user-scanner module: %s", entry)
+            message = "skipping side-effectful user-scanner module: %s"
+            if entry in curated:
+                log.warning(message, entry)
+            else:
+                log.debug(message, entry)
             continue
         try:
             category, module_name = entry.split("/", 1)
             module = importlib.import_module(
                 f"user_scanner.email_scan.{category}.{module_name}"
             )
-            providers.append(UserScannerProvider(module, category, module_name))
+            provider = UserScannerProvider(module, category, module_name)
+            if entry not in curated:
+                provider.info.description = (
+                    f"User Scanner extended-profile candidate · {module_name}"
+                )
+                provider.info.notes = (
+                    "Maintained by user-scanner; excluded from the reliable profile "
+                    "because the latest live audit was inconclusive"
+                )
+            providers.append(provider)
         except Exception as exc:
             log.warning("failed to load user-scanner module %s: %s", entry, exc)
     return providers

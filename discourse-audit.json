@@ -1,0 +1,2228 @@
+{
+  "audited_at": "2026-08-27T17:44:34.145593+00:00",
+  "method": "read-only Discourse check_email endpoint with two random negative controls; requires public hide_email_address_taken=false",
+  "passed": [
+    {
+      "name": "linux_containers_forum",
+      "title": "Linux Containers Forum",
+      "homepage": "https://discuss.linuxcontainers.org",
+      "passed": true,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.linuxcontainers.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.linuxcontainers.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    }
+  ],
+  "failed": [
+    {
+      "name": "discourse_meta",
+      "title": "Discourse Meta",
+      "homepage": "https://meta.discourse.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "meta.discourse.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "meta.discourse.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "openai_community",
+      "title": "OpenAI Community",
+      "homepage": "https://community.openai.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.openai.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.openai.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "cloudflare_community",
+      "title": "Cloudflare Community",
+      "homepage": "https://community.cloudflare.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 403,
+          "final_host": "community.cloudflare.com",
+          "success": null,
+          "body": "<!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 403,
+          "final_host": "community.cloudflare.com",
+          "success": null,
+          "body": "<!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content"
+        }
+      ]
+    },
+    {
+      "name": "python_discussions",
+      "title": "Python Discussions",
+      "homepage": "https://discuss.python.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.python.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.python.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "pytorch_forum",
+      "title": "PyTorch Forums",
+      "homepage": "https://discuss.pytorch.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.pytorch.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.pytorch.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "huggingface_forum",
+      "title": "Hugging Face Forums",
+      "homepage": "https://discuss.huggingface.co",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.huggingface.co",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.huggingface.co",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "grafana_community",
+      "title": "Grafana Labs Community",
+      "homepage": "https://community.grafana.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.grafana.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.grafana.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "elastic_discuss",
+      "title": "Elastic Discuss",
+      "homepage": "https://discuss.elastic.co",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.elastic.co",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.elastic.co",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "arduino_forum",
+      "title": "Arduino Forum",
+      "homepage": "https://forum.arduino.cc",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.arduino.cc",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.arduino.cc",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "home_assistant_community",
+      "title": "Home Assistant Community",
+      "homepage": "https://community.home-assistant.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.home-assistant.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.home-assistant.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "lets_encrypt_community",
+      "title": "Let's Encrypt Community",
+      "homepage": "https://community.letsencrypt.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.letsencrypt.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.letsencrypt.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "freecodecamp_forum",
+      "title": "freeCodeCamp Forum",
+      "homepage": "https://forum.freecodecamp.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.freecodecamp.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.freecodecamp.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "brave_community",
+      "title": "Brave Community",
+      "homepage": "https://community.brave.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.brave.app",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.brave.app",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "manjaro_forum",
+      "title": "Manjaro Linux Forum",
+      "homepage": "https://forum.manjaro.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.manjaro.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.manjaro.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "endeavouros_forum",
+      "title": "EndeavourOS Forum",
+      "homepage": "https://forum.endeavouros.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.endeavouros.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.endeavouros.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "julia_discourse",
+      "title": "Julia Programming Language",
+      "homepage": "https://discourse.julialang.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.julialang.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.julialang.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "ray_discuss",
+      "title": "Ray Discuss",
+      "homepage": "https://discuss.ray.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.ray.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.ray.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "dvc_discuss",
+      "title": "DVC Discuss",
+      "homepage": "https://discuss.dvc.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.dvc.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.dvc.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "streamlit_forum",
+      "title": "Streamlit Community",
+      "homepage": "https://discuss.streamlit.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.streamlit.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.streamlit.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "obsidian_forum",
+      "title": "Obsidian Forum",
+      "homepage": "https://forum.obsidian.md",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.obsidian.md",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.obsidian.md",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "cursor_forum",
+      "title": "Cursor Forum",
+      "homepage": "https://forum.cursor.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.cursor.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.cursor.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "kubernetes_discuss",
+      "title": "Kubernetes Discuss",
+      "homepage": "https://discuss.kubernetes.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.kubernetes.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.kubernetes.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "flyio_community",
+      "title": "Fly.io Community",
+      "homepage": "https://community.fly.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.fly.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.fly.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "render_community",
+      "title": "Render Community",
+      "homepage": "https://community.render.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "error": "ConnectError: [Errno 11001] getaddrinfo failed"
+        },
+        {
+          "email_domain": "outlook.com",
+          "error": "ConnectError: [Errno 11001] getaddrinfo failed"
+        }
+      ]
+    },
+    {
+      "name": "vercel_community",
+      "title": "Vercel Community",
+      "homepage": "https://community.vercel.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.vercel.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.vercel.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "make_community",
+      "title": "Make Community",
+      "homepage": "https://community.make.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.make.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.make.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "n8n_community",
+      "title": "n8n Community",
+      "homepage": "https://community.n8n.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.n8n.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.n8n.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "ros_discourse",
+      "title": "ROS Discourse",
+      "homepage": "https://discourse.ros.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.openrobotics.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.openrobotics.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "ubuntu_discourse",
+      "title": "Ubuntu Community Discourse",
+      "homepage": "https://discourse.ubuntu.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.ubuntu.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.ubuntu.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "mozilla_discourse",
+      "title": "Mozilla Discourse",
+      "homepage": "https://discourse.mozilla.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.mozilla.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.mozilla.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "snapcraft_forum",
+      "title": "Snapcraft Forum",
+      "homepage": "https://forum.snapcraft.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.snapcraft.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.snapcraft.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "framework_community",
+      "title": "Framework Community",
+      "homepage": "https://community.frame.work",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.frame.work",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.frame.work",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "codecademy_forum",
+      "title": "Codecademy Forums",
+      "homepage": "https://discuss.codecademy.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "error": "ConnectError: [Errno 11001] getaddrinfo failed"
+        },
+        {
+          "email_domain": "outlook.com",
+          "error": "ConnectError: [Errno 11001] getaddrinfo failed"
+        }
+      ]
+    },
+    {
+      "name": "code_org_forum",
+      "title": "Code.org Professional Learning Community",
+      "homepage": "https://forum.code.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.code.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.code.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "deeplearning_ai_community",
+      "title": "DeepLearning.AI Community",
+      "homepage": "https://community.deeplearning.ai",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.deeplearning.ai",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.deeplearning.ai",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "webflow_forum",
+      "title": "Webflow Forum",
+      "homepage": "https://forum.webflow.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.webflow.com",
+          "success": null,
+          "body": "<!DOCTYPE html><html lang=\"en-US\" dir=\"ltr\"><head><meta charSet=\"UTF-8\"/><title data-rh=\"true\">Webflow Community - Connect, build, and learn together</title><meta name=\"description"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.webflow.com",
+          "success": null,
+          "body": "<!DOCTYPE html><html lang=\"en-US\" dir=\"ltr\"><head><meta charSet=\"UTF-8\"/><title data-rh=\"true\">Webflow Community - Connect, build, and learn together</title><meta name=\"description"
+        }
+      ]
+    },
+    {
+      "name": "bubble_forum",
+      "title": "Bubble Forum",
+      "homepage": "https://forum.bubble.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.bubble.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.bubble.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "glide_community",
+      "title": "Glide Community",
+      "homepage": "https://community.glideapps.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.glideapps.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.glideapps.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "frappe_forum",
+      "title": "Frappe Forum",
+      "homepage": "https://discuss.frappe.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.frappe.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.frappe.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "hugo_discourse",
+      "title": "Hugo Discourse",
+      "homepage": "https://discourse.gohugo.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.gohugo.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.gohugo.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "gamedev_tv_community",
+      "title": "GameDev.tv Community",
+      "homepage": "https://community.gamedev.tv",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.gamedev.tv",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.gamedev.tv",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "wanikani_community",
+      "title": "WaniKani Community",
+      "homepage": "https://community.wanikani.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.wanikani.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.wanikani.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "fastai_forum",
+      "title": "fast.ai Forums",
+      "homepage": "https://forums.fast.ai",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forums.fast.ai",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forums.fast.ai",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "ocaml_discuss",
+      "title": "OCaml Discuss",
+      "homepage": "https://discuss.ocaml.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.ocaml.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.ocaml.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "rust_users_forum",
+      "title": "Rust Users Forum",
+      "homepage": "https://users.rust-lang.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "users.rust-lang.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "users.rust-lang.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "rust_internals_forum",
+      "title": "Rust Internals",
+      "homepage": "https://internals.rust-lang.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "internals.rust-lang.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "internals.rust-lang.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "django_forum",
+      "title": "Django Forum",
+      "homepage": "https://forum.djangoproject.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.djangoproject.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.djangoproject.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "matplotlib_discourse",
+      "title": "Matplotlib Discourse",
+      "homepage": "https://discourse.matplotlib.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.matplotlib.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.matplotlib.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "jupyter_discourse",
+      "title": "Jupyter Community Forum",
+      "homepage": "https://discourse.jupyter.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.jupyter.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.jupyter.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "nixos_discourse",
+      "title": "NixOS Discourse",
+      "homepage": "https://discourse.nixos.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.nixos.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.nixos.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "fedora_discussion",
+      "title": "Fedora Discussion",
+      "homepage": "https://discussion.fedoraproject.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discussion.fedoraproject.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discussion.fedoraproject.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "flathub_discourse",
+      "title": "Flathub Discourse",
+      "homepage": "https://discourse.flathub.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.flathub.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.flathub.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "openwrt_forum",
+      "title": "OpenWrt Forum",
+      "homepage": "https://forum.openwrt.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.openwrt.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.openwrt.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "openstreetmap_community",
+      "title": "OpenStreetMap Community Forum",
+      "homepage": "https://community.openstreetmap.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.openstreetmap.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.openstreetmap.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "grapheneos_discussion",
+      "title": "GrapheneOS Discussion Forum",
+      "homepage": "https://discuss.grapheneos.org",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 404,
+          "final_host": "discuss.grapheneos.org",
+          "success": null,
+          "body": "<!DOCTYPE html> <html>   <head>     <meta charset=\"utf-8\">          <title>GrapheneOS Discussion Forum</title>     <meta name=\"viewport\" content=\"width=device-width, initial-scale="
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 404,
+          "final_host": "discuss.grapheneos.org",
+          "success": null,
+          "body": "<!DOCTYPE html> <html>   <head>     <meta charset=\"utf-8\">          <title>GrapheneOS Discussion Forum</title>     <meta name=\"viewport\" content=\"width=device-width, initial-scale="
+        }
+      ]
+    },
+    {
+      "name": "level1techs_forum",
+      "title": "Level1Techs Forums",
+      "homepage": "https://forum.level1techs.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.level1techs.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.level1techs.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "unreal_engine_forums",
+      "title": "Epic Developer Community Forums",
+      "homepage": "https://forums.unrealengine.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forums.unrealengine.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forums.unrealengine.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "swift_forums",
+      "title": "Swift Forums",
+      "homepage": "https://forums.swift.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forums.swift.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forums.swift.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "posit_community",
+      "title": "Posit Community",
+      "homepage": "https://forum.posit.co",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.posit.co",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.posit.co",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "plotly_community",
+      "title": "Plotly Community Forum",
+      "homepage": "https://community.plotly.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.plotly.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.plotly.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "scientific_python_discuss",
+      "title": "Scientific Python Discuss",
+      "homepage": "https://discuss.scientific-python.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.scientific-python.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.scientific-python.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "mcneel_forum",
+      "title": "McNeel Forum",
+      "homepage": "https://discourse.mcneel.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.mcneel.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.mcneel.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "image_sc_forum",
+      "title": "Scientific Community Image Forum",
+      "homepage": "https://forum.image.sc",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 403,
+          "final_host": "forum.image.sc",
+          "success": null,
+          "body": "Crawler is not allowed!"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 403,
+          "final_host": "forum.image.sc",
+          "success": null,
+          "body": "Crawler is not allowed!"
+        }
+      ]
+    },
+    {
+      "name": "opencv_forum",
+      "title": "OpenCV Forum",
+      "homepage": "https://forum.opencv.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.opencv.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.opencv.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "itk_discourse",
+      "title": "ITK Discourse",
+      "homepage": "https://discourse.itk.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.itk.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.itk.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "vtk_discourse",
+      "title": "VTK Discourse",
+      "homepage": "https://discourse.vtk.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.vtk.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.vtk.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "llvm_discourse",
+      "title": "LLVM Discourse",
+      "homepage": "https://discourse.llvm.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.llvm.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.llvm.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "cmake_discourse",
+      "title": "CMake Discourse",
+      "homepage": "https://discourse.cmake.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.cmake.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.cmake.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "bokeh_discourse",
+      "title": "Bokeh Discourse",
+      "homepage": "https://discourse.bokeh.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.bokeh.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.bokeh.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "traefik_community",
+      "title": "Traefik Labs Community Forum",
+      "homepage": "https://community.traefik.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.traefik.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.traefik.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "temporal_community",
+      "title": "Temporal Community Forum",
+      "homepage": "https://community.temporal.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.temporal.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.temporal.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "confluent_community",
+      "title": "Confluent Community",
+      "homepage": "https://forum.confluent.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.confluent.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.confluent.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "hashicorp_discuss",
+      "title": "HashiCorp Discuss",
+      "homepage": "https://discuss.hashicorp.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.hashicorp.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.hashicorp.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "auth0_community",
+      "title": "Auth0 Community",
+      "homepage": "https://community.auth0.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.auth0.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.auth0.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "ionic_forum",
+      "title": "Ionic Forum",
+      "homepage": "https://forum.ionicframework.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.ionicframework.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.ionicframework.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "sentry_forum",
+      "title": "Sentry Developer Community",
+      "homepage": "https://forum.sentry.io",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "sentry.io",
+          "success": null,
+          "body": "<!DOCTYPE html><html lang=\"en\" class=\"dark\"> <head><script nonce=\"RDmIoYm64wNXCgFJg1ZCMVbZtB85AgwZ\">       // Prevent SecurityError from third-party scripts (e.g. imtgo_device_info"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "sentry.io",
+          "success": null,
+          "body": "<!DOCTYPE html><html lang=\"en\" class=\"dark\"> <head><script nonce=\"iBboG1Xc3HwTgjl95jjW2DgVNYBzi3s8\">       // Prevent SecurityError from third-party scripts (e.g. imtgo_device_info"
+        }
+      ]
+    },
+    {
+      "name": "sublime_text_forum",
+      "title": "Sublime Forum",
+      "homepage": "https://forum.sublimetext.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 404,
+          "final_host": "forum.sublimetext.com",
+          "success": null,
+          "body": "{\"errors\":[\"The requested URL or resource could not be found.\"],\"error_type\":\"not_found\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 404,
+          "final_host": "forum.sublimetext.com",
+          "success": null,
+          "body": "{\"errors\":[\"The requested URL or resource could not be found.\"],\"error_type\":\"not_found\"}"
+        }
+      ]
+    },
+    {
+      "name": "ghost_forum",
+      "title": "Ghost Forum",
+      "homepage": "https://forum.ghost.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.ghost.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.ghost.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "strapi_forum",
+      "title": "Strapi Community Forum",
+      "homepage": "https://forum.strapi.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.strapi.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.strapi.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "postman_community",
+      "title": "Postman Community",
+      "homepage": "https://community.postman.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.postman.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.postman.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "deno_discourse",
+      "title": "Deno Community",
+      "homepage": "https://questions.deno.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "questions.deno.com",
+          "success": null,
+          "body": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" href=\"https://cdn.di"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "questions.deno.com",
+          "success": null,
+          "body": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" href=\"https://cdn.di"
+        }
+      ]
+    },
+    {
+      "name": "dfinity_forum",
+      "title": "Internet Computer Developer Forum",
+      "homepage": "https://forum.dfinity.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.dfinity.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.dfinity.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "ipfs_discuss",
+      "title": "IPFS Forums",
+      "homepage": "https://discuss.ipfs.tech",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discuss.ipfs.tech",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discuss.ipfs.tech",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "filecoin_discuss",
+      "title": "Filecoin Community",
+      "homepage": "https://github.com/filecoin-project/community/discussions",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 404,
+          "final_host": "github.com",
+          "success": null,
+          "body": "        <!DOCTYPE html> <html   lang=\"en\"      data-color-mode=\"auto\" data-light-theme=\"light\" data-dark-theme=\"dark\"   data-a11y-animated-images=\"system\" data-a11y-link-underlines"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 404,
+          "final_host": "github.com",
+          "success": null,
+          "body": "        <!DOCTYPE html> <html   lang=\"en\"      data-color-mode=\"auto\" data-light-theme=\"light\" data-dark-theme=\"dark\"   data-a11y-animated-images=\"system\" data-a11y-link-underlines"
+        }
+      ]
+    },
+    {
+      "name": "ethereum_magicians",
+      "title": "Fellowship of Ethereum Magicians",
+      "homepage": "https://ethereum-magicians.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "ethereum-magicians.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "ethereum-magicians.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "ethereum_research",
+      "title": "Ethereum Research",
+      "homepage": "https://ethresear.ch",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "ethresear.ch",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "ethresear.ch",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "optimism_collective",
+      "title": "Optimism Collective",
+      "homepage": "https://gov.optimism.io",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "gov.optimism.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "gov.optimism.io",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "cosmos_forum",
+      "title": "Cosmos Hub Forum",
+      "homepage": "https://forum.cosmos.network",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.cosmos.network",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.cosmos.network",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "rocket_chat_forum",
+      "title": "Rocket.Chat Forum",
+      "homepage": "https://forums.rocket.chat",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forums.rocket.chat",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forums.rocket.chat",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "openhab_community",
+      "title": "openHAB Community",
+      "homepage": "https://community.openhab.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.openhab.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.openhab.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "coreelec_forum",
+      "title": "CoreELEC Forums",
+      "homepage": "https://discourse.coreelec.org",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.coreelec.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.coreelec.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "qgis_discourse",
+      "title": "QGIS Discourse",
+      "homepage": "https://discourse.osgeo.org/c/qgis",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "discourse.osgeo.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "discourse.osgeo.org",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    }
+  ]
+}

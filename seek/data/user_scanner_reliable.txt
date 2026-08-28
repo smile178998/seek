@@ -122,3 +122,17 @@ shopping/nykaaman
 social/gravatar
 social/plurk
 social/x
+
+# Added after two-domain negative-control checks on 2026-08-28
+# with user-scanner 1.5.0.2. Sweat was intentionally not promoted because
+# its own result warns that OAuth-only accounts can be missed.
+creator/vimeo
+dating/lespark
+entertainment/dreame
+entertainment/girlslife
+entertainment/netflix
+fitness/evolveyou
+gaming/stackb
+learning/classdojo
+other/secondline
+women_health/womanlog

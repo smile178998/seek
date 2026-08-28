@@ -1,0 +1,483 @@
+{
+  "audited_at": "2026-08-27T17:48:31.871735+00:00",
+  "method": "two random negative controls (gmail.com + outlook.com)",
+  "side_effectful_modules_excluded": [
+    "adult/babestation",
+    "adult/fantasia",
+    "adult/flirtbate",
+    "adult/made_porn",
+    "adult/sexvid",
+    "creator/buymeacoffee",
+    "creator/gumroad",
+    "dev/luarocks",
+    "entertainment/anilist",
+    "entertainment/hoichoi",
+    "entertainment/weverse",
+    "fitness/finch",
+    "learning/asafeer",
+    "learning/bnrlanguages",
+    "learning/bunpo",
+    "learning/cambly",
+    "learning/hanzii",
+    "learning/hellochinese",
+    "learning/heyjapan",
+    "learning/programminghub",
+    "learning/talkpal",
+    "other/ama",
+    "other/dragongroot",
+    "social/couplejoy",
+    "social/slowly",
+    "social/superlive",
+    "sports/uniscore"
+  ],
+  "candidates": [
+    {
+      "module": "community/stackoverflow",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Unexpected response body"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Unexpected response body"
+        }
+      ]
+    },
+    {
+      "module": "creator/kick",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Unexpected response state (HTTP 422)"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Unexpected response state (HTTP 422)"
+        }
+      ]
+    },
+    {
+      "module": "creator/vimeo",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "dating/lespark",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "dating/locanto",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Unexpected response status: 403, report it via GitHub issues"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Unexpected response status: 403, report it via GitHub issues"
+        }
+      ]
+    },
+    {
+      "module": "dating/okcupid",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Unexpected token status: 403, report it via GitHub issues"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Unexpected token status: 403, report it via GitHub issues"
+        }
+      ]
+    },
+    {
+      "module": "dating/skout",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Unexpected response status: 403, report it via GitHub issues"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Unexpected response status: 403, report it via GitHub issues"
+        }
+      ]
+    },
+    {
+      "module": "dev/codecademy",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Connection timed out"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "dev/github",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "GitHub's signup form is behind a bot challenge, and the address is not on any public profile"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "GitHub's signup form is behind a bot challenge, and the address is not on any public profile"
+        }
+      ]
+    },
+    {
+      "module": "entertainment/dreame",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "entertainment/girlslife",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "entertainment/letterboxd",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Could not extract Letterboxd CSRF token"
+        }
+      ]
+    },
+    {
+      "module": "entertainment/netflix",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "fitness/evolveyou",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "fitness/sweat",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": "Target may have an OAuth-only registered account (Apple, Google, or Facebook)"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": "Target may have an OAuth-only registered account (Apple, Google, or Facebook)"
+        }
+      ]
+    },
+    {
+      "module": "gaming/stackb",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "hosting/render",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Render Error: {\"email\":\"invalid\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Render Error: {\"email\":\"invalid\"}"
+        }
+      ]
+    },
+    {
+      "module": "learning/classdojo",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "learning/quizlet",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Unexpected response status: 403, report it via GitHub issues"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Unexpected response status: 403, report it via GitHub issues"
+        }
+      ]
+    },
+    {
+      "module": "news/nytimes",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Bot detection triggered on the check (403)"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Bot detection triggered on the check (403)"
+        }
+      ]
+    },
+    {
+      "module": "other/deviantart",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Failed to extract CSRF token from window variable"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Failed to extract CSRF token from window variable"
+        }
+      ]
+    },
+    {
+      "module": "other/office365",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "TAKEN",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "other/secondline",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "module": "social/classmates",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Caught by WAF (403) during Handshake"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Caught by WAF (403) during Handshake"
+        }
+      ]
+    },
+    {
+      "module": "social/tumblr",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "unexpected exception: HTTP Error 403: Forbidden"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "unexpected exception: HTTP Error 403: Forbidden"
+        }
+      ]
+    },
+    {
+      "module": "travel/emirates",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "ReadTimeout: "
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "ReadTimeout: "
+        }
+      ]
+    },
+    {
+      "module": "travel/polarsteps",
+      "passed": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "ERROR",
+          "reason": "Unexpected: {\"ERROR\":\""
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "ERROR",
+          "reason": "Unexpected: {\"ERROR\":\""
+        }
+      ]
+    },
+    {
+      "module": "women_health/womanlog",
+      "passed": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": "AVAILABLE",
+          "reason": null
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": "AVAILABLE",
+          "reason": null
+        }
+      ]
+    }
+  ]
+}

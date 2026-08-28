@@ -1,0 +1,104 @@
+{
+  "audited_at": "2026-08-27T19:08:01.498636+00:00",
+  "method": "read-only Discourse check_email endpoint with two random negative controls; requires public hide_email_address_taken=false",
+  "passed": [
+    {
+      "name": "aqara_forum",
+      "title": "Aqara Forum",
+      "homepage": "https://forum.aqara.com",
+      "passed": true,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.aqara.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.aqara.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    }
+  ],
+  "failed": [
+    {
+      "name": "chuwi_forum",
+      "title": "CHUWI 官方论坛",
+      "homepage": "https://forum.chuwi.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.chuwi.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.chuwi.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "seafile_forum",
+      "title": "Seafile 社区论坛",
+      "homepage": "https://forum.seafile.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.seafile.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.seafile.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "zimaspace_community",
+      "title": "冰鲸科技社区",
+      "homepage": "https://community.zimaspace.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "community.zimaspace.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "community.zimaspace.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    }
+  ]
+}

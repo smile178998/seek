@@ -4,6 +4,7 @@ category: forum
 homepage: https://forum.openeuler.org
 description: 使用论坛注册页调用的 Discourse 公开邮箱可用性校验接口
 notes: 只读校验，不发送验证码、激活邮件或找回邮件；2026-08 使用 Gmail 与 Outlook 随机邮箱双样本验证
+enabled: false  # 已由带实时 hide_email_address_taken 保护的 Python 模块接管
 
 request:
   method: GET

@@ -1,0 +1,288 @@
+- name: discourse_meta
+  title: Discourse Meta
+  homepage: https://meta.discourse.org
+- name: openai_community
+  title: OpenAI Community
+  homepage: https://community.openai.com
+- name: cloudflare_community
+  title: Cloudflare Community
+  homepage: https://community.cloudflare.com
+- name: python_discussions
+  title: Python Discussions
+  homepage: https://discuss.python.org
+- name: pytorch_forum
+  title: PyTorch Forums
+  homepage: https://discuss.pytorch.org
+- name: huggingface_forum
+  title: Hugging Face Forums
+  homepage: https://discuss.huggingface.co
+- name: grafana_community
+  title: Grafana Labs Community
+  homepage: https://community.grafana.com
+- name: elastic_discuss
+  title: Elastic Discuss
+  homepage: https://discuss.elastic.co
+- name: arduino_forum
+  title: Arduino Forum
+  homepage: https://forum.arduino.cc
+- name: home_assistant_community
+  title: Home Assistant Community
+  homepage: https://community.home-assistant.io
+- name: lets_encrypt_community
+  title: Let's Encrypt Community
+  homepage: https://community.letsencrypt.org
+- name: freecodecamp_forum
+  title: freeCodeCamp Forum
+  homepage: https://forum.freecodecamp.org
+- name: brave_community
+  title: Brave Community
+  homepage: https://community.brave.com
+- name: manjaro_forum
+  title: Manjaro Linux Forum
+  homepage: https://forum.manjaro.org
+- name: endeavouros_forum
+  title: EndeavourOS Forum
+  homepage: https://forum.endeavouros.com
+- name: julia_discourse
+  title: Julia Programming Language
+  homepage: https://discourse.julialang.org
+- name: ray_discuss
+  title: Ray Discuss
+  homepage: https://discuss.ray.io
+- name: dvc_discuss
+  title: DVC Discuss
+  homepage: https://discuss.dvc.org
+- name: streamlit_forum
+  title: Streamlit Community
+  homepage: https://discuss.streamlit.io
+- name: obsidian_forum
+  title: Obsidian Forum
+  homepage: https://forum.obsidian.md
+- name: cursor_forum
+  title: Cursor Forum
+  homepage: https://forum.cursor.com
+- name: kubernetes_discuss
+  title: Kubernetes Discuss
+  homepage: https://discuss.kubernetes.io
+- name: flyio_community
+  title: Fly.io Community
+  homepage: https://community.fly.io
+- name: render_community
+  title: Render Community
+  homepage: https://community.render.com
+- name: vercel_community
+  title: Vercel Community
+  homepage: https://community.vercel.com
+- name: make_community
+  title: Make Community
+  homepage: https://community.make.com
+- name: n8n_community
+  title: n8n Community
+  homepage: https://community.n8n.io
+- name: ros_discourse
+  title: ROS Discourse
+  homepage: https://discourse.ros.org
+- name: ubuntu_discourse
+  title: Ubuntu Community Discourse
+  homepage: https://discourse.ubuntu.com
+- name: mozilla_discourse
+  title: Mozilla Discourse
+  homepage: https://discourse.mozilla.org
+- name: snapcraft_forum
+  title: Snapcraft Forum
+  homepage: https://forum.snapcraft.io
+- name: framework_community
+  title: Framework Community
+  homepage: https://community.frame.work
+- name: codecademy_forum
+  title: Codecademy Forums
+  homepage: https://discuss.codecademy.com
+- name: code_org_forum
+  title: Code.org Professional Learning Community
+  homepage: https://forum.code.org
+- name: deeplearning_ai_community
+  title: DeepLearning.AI Community
+  homepage: https://community.deeplearning.ai
+- name: webflow_forum
+  title: Webflow Forum
+  homepage: https://forum.webflow.com
+- name: bubble_forum
+  title: Bubble Forum
+  homepage: https://forum.bubble.io
+- name: glide_community
+  title: Glide Community
+  homepage: https://community.glideapps.com
+- name: frappe_forum
+  title: Frappe Forum
+  homepage: https://discuss.frappe.io
+- name: hugo_discourse
+  title: Hugo Discourse
+  homepage: https://discourse.gohugo.io
+- name: gamedev_tv_community
+  title: GameDev.tv Community
+  homepage: https://community.gamedev.tv
+- name: wanikani_community
+  title: WaniKani Community
+  homepage: https://community.wanikani.com
+- name: fastai_forum
+  title: fast.ai Forums
+  homepage: https://forums.fast.ai
+- name: ocaml_discuss
+  title: OCaml Discuss
+  homepage: https://discuss.ocaml.org
+- name: rust_users_forum
+  title: Rust Users Forum
+  homepage: https://users.rust-lang.org
+- name: rust_internals_forum
+  title: Rust Internals
+  homepage: https://internals.rust-lang.org
+- name: django_forum
+  title: Django Forum
+  homepage: https://forum.djangoproject.com
+- name: matplotlib_discourse
+  title: Matplotlib Discourse
+  homepage: https://discourse.matplotlib.org
+- name: jupyter_discourse
+  title: Jupyter Community Forum
+  homepage: https://discourse.jupyter.org
+- name: nixos_discourse
+  title: NixOS Discourse
+  homepage: https://discourse.nixos.org
+- name: fedora_discussion
+  title: Fedora Discussion
+  homepage: https://discussion.fedoraproject.org
+- name: linux_containers_forum
+  title: Linux Containers Forum
+  homepage: https://discuss.linuxcontainers.org
+- name: flathub_discourse
+  title: Flathub Discourse
+  homepage: https://discourse.flathub.org
+- name: openwrt_forum
+  title: OpenWrt Forum
+  homepage: https://forum.openwrt.org
+- name: openstreetmap_community
+  title: OpenStreetMap Community Forum
+  homepage: https://community.openstreetmap.org
+- name: grapheneos_discussion
+  title: GrapheneOS Discussion Forum
+  homepage: https://discuss.grapheneos.org
+- name: level1techs_forum
+  title: Level1Techs Forums
+  homepage: https://forum.level1techs.com
+- name: unreal_engine_forums
+  title: Epic Developer Community Forums
+  homepage: https://forums.unrealengine.com
+- name: swift_forums
+  title: Swift Forums
+  homepage: https://forums.swift.org
+- name: posit_community
+  title: Posit Community
+  homepage: https://forum.posit.co
+- name: plotly_community
+  title: Plotly Community Forum
+  homepage: https://community.plotly.com
+- name: scientific_python_discuss
+  title: Scientific Python Discuss
+  homepage: https://discuss.scientific-python.org
+- name: mcneel_forum
+  title: McNeel Forum
+  homepage: https://discourse.mcneel.com
+- name: image_sc_forum
+  title: Scientific Community Image Forum
+  homepage: https://forum.image.sc
+- name: opencv_forum
+  title: OpenCV Forum
+  homepage: https://forum.opencv.org
+- name: itk_discourse
+  title: ITK Discourse
+  homepage: https://discourse.itk.org
+- name: vtk_discourse
+  title: VTK Discourse
+  homepage: https://discourse.vtk.org
+- name: llvm_discourse
+  title: LLVM Discourse
+  homepage: https://discourse.llvm.org
+- name: cmake_discourse
+  title: CMake Discourse
+  homepage: https://discourse.cmake.org
+- name: bokeh_discourse
+  title: Bokeh Discourse
+  homepage: https://discourse.bokeh.org
+- name: traefik_community
+  title: Traefik Labs Community Forum
+  homepage: https://community.traefik.io
+- name: temporal_community
+  title: Temporal Community Forum
+  homepage: https://community.temporal.io
+- name: confluent_community
+  title: Confluent Community
+  homepage: https://forum.confluent.io
+- name: hashicorp_discuss
+  title: HashiCorp Discuss
+  homepage: https://discuss.hashicorp.com
+- name: auth0_community
+  title: Auth0 Community
+  homepage: https://community.auth0.com
+- name: ionic_forum
+  title: Ionic Forum
+  homepage: https://forum.ionicframework.com
+- name: sentry_forum
+  title: Sentry Developer Community
+  homepage: https://forum.sentry.io
+- name: sublime_text_forum
+  title: Sublime Forum
+  homepage: https://forum.sublimetext.com
+- name: ghost_forum
+  title: Ghost Forum
+  homepage: https://forum.ghost.org
+- name: strapi_forum
+  title: Strapi Community Forum
+  homepage: https://forum.strapi.io
+- name: postman_community
+  title: Postman Community
+  homepage: https://community.postman.com
+- name: deno_discourse
+  title: Deno Community
+  homepage: https://questions.deno.com
+- name: dfinity_forum
+  title: Internet Computer Developer Forum
+  homepage: https://forum.dfinity.org
+- name: ipfs_discuss
+  title: IPFS Forums
+  homepage: https://discuss.ipfs.tech
+- name: filecoin_discuss
+  title: Filecoin Community
+  homepage: https://github.com/filecoin-project/community/discussions
+- name: ethereum_magicians
+  title: Fellowship of Ethereum Magicians
+  homepage: https://ethereum-magicians.org
+- name: ethereum_research
+  title: Ethereum Research
+  homepage: https://ethresear.ch
+- name: optimism_collective
+  title: Optimism Collective
+  homepage: https://gov.optimism.io
+- name: cosmos_forum
+  title: Cosmos Hub Forum
+  homepage: https://forum.cosmos.network
+- name: rocket_chat_forum
+  title: Rocket.Chat Forum
+  homepage: https://forums.rocket.chat
+- name: openhab_community
+  title: openHAB Community
+  homepage: https://community.openhab.org
+- name: coreelec_forum
+  title: CoreELEC Forums
+  homepage: https://discourse.coreelec.org
+- name: qgis_discourse
+  title: QGIS Discourse
+  homepage: https://discourse.osgeo.org/c/qgis
+- name: appinn_forum
+  title: 小众软件社区
+  homepage: https://meta.appinn.net
+- name: fit2cloud_forum
+  title: 飞致云社区
+  homepage: https://bbs.fit2cloud.com
+- name: openeuler_forum
+  title: openEuler 论坛
+  homepage: https://forum.openeuler.org

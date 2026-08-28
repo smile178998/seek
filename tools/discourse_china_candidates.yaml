@@ -1,0 +1,133 @@
+# Chinese-language or China-operated Discourse communities for live audit.
+# This is a candidate inventory, not the reliable allowlist.
+- name: discoze_community
+  title: Discoze 中文社区
+  homepage: https://www.discoze.com
+
+- name: linux_do
+  title: LINUX DO
+  homepage: https://linux.do
+
+- name: isharkfly_community
+  title: iSharkFly 飞鲨社区
+  homepage: https://www.isharkfly.com
+
+- name: nodeloc_community
+  title: NodeLoc
+  homepage: https://www.nodeloc.com
+
+- name: justnainai_community
+  title: 宅宅的妙妙屋
+  homepage: https://www.justnainai.com
+
+- name: idcflare_community
+  title: IDC Flare
+  homepage: https://idcflare.com
+
+- name: trae_community
+  title: TRAE 官方中文社区
+  homepage: https://forum.trae.cn
+
+- name: cax_forum
+  title: CAX Forum
+  homepage: https://www.cax.do
+
+- name: freemdict_forum
+  title: FreeMdict Forum
+  homepage: https://forum.freemdict.com
+
+- name: koishi_forum
+  title: Koishi 论坛
+  homepage: https://forum.koishi.xyz
+
+- name: quectel_chinese_forum
+  title: 移远中文支持社区
+  homepage: https://forumschinese.quectel.com
+
+- name: tidb_forum
+  title: TiDB 社区论坛
+  homepage: https://ask.pingcap.com
+
+- name: deepseek_club
+  title: 深求社区
+  homepage: https://deepseek.club
+
+- name: iosre_forum
+  title: 睿论坛
+  homepage: https://iosre.com
+
+- name: akarinliu_forum
+  title: 阿卡林刘の论坛
+  homepage: https://forum.akarinliu.com
+
+- name: niege_meta
+  title: NieGe Meta
+  homepage: https://niege.app
+
+- name: qingju_community
+  title: 青橘社区
+  homepage: https://qingju.cyou
+
+- name: seeedstudio_forum
+  title: Seeed Studio Forum
+  homepage: https://forum.seeedstudio.com
+
+- name: khadas_forum
+  title: Khadas Community
+  homepage: https://forum.khadas.com
+
+- name: radxa_forum
+  title: Radxa Community
+  homepage: https://forum.radxa.com
+
+- name: bananapi_forum
+  title: Banana Pi Forum
+  homepage: https://forum.banana-pi.org
+
+- name: glinet_forum
+  title: GL.iNet 官方论坛
+  homepage: https://forum.gl-inet.com
+
+- name: clockworkpi_forum
+  title: ClockworkPi 社区
+  homepage: https://forum.clockworkpi.com
+
+- name: arducam_forum
+  title: Arducam 技术支持论坛
+  homepage: https://forum.arducam.com
+
+- name: luckfox_forum
+  title: Luckfox Forum
+  homepage: https://forum.luckfox.com
+
+- name: youyeetoo_forum
+  title: Youyeetoo Forum
+  homepage: https://forum.youyeetoo.com
+
+- name: aqara_forum
+  title: Aqara Forum
+  homepage: https://forum.aqara.com
+
+- name: chuwi_forum
+  title: CHUWI 官方论坛
+  homepage: https://forum.chuwi.com
+
+- name: seafile_forum
+  title: Seafile 社区论坛
+  homepage: https://forum.seafile.com
+
+- name: zimaspace_community
+  title: 冰鲸科技社区
+  homepage: https://community.zimaspace.com
+
+- name: appinn_forum
+  title: 小众软件社区
+  homepage: https://meta.appinn.net
+
+- name: fit2cloud_forum
+  title: 飞致云社区
+  homepage: https://bbs.fit2cloud.com
+
+- name: openeuler_forum
+  title: openEuler 论坛
+  homepage: https://forum.openeuler.org

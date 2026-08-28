@@ -10,6 +10,7 @@ let STATUS_LABEL = {
 
 let CATEGORY_LABEL = {
   social: "社交",
+  dating: "交友",
   shop: "电商",
   dev: "开发",
   profile: "资料",
@@ -73,7 +74,7 @@ const LABELS_EN = {
     skipped: "Skipped",
   },
   category: {
-    social: "Social", shop: "Shopping", dev: "Development", profile: "Profiles",
+    social: "Social", dating: "Dating", shop: "Shopping", dev: "Development", profile: "Profiles",
     breach: "Breaches", domain: "Domain", mail: "Email", music: "Music",
     media: "Media", forum: "Forums", crm: "CRM", payment: "Payments",
     crowdfunding: "Crowdfunding", adult: "Adult", osint: "Intelligence",
@@ -663,7 +664,7 @@ function setRunning(running) {
 /* ---------------- 渲染 ---------------- */
 const STATUS_ORDER = ["registered", "info", "unknown", "rate_limited", "not_registered", "error", "skipped"];
 const CATEGORY_ORDER = [
-  "domain", "mail", "breach", "profile", "social", "forum", "crm",
+  "domain", "mail", "breach", "profile", "social", "dating", "forum", "crm",
   "dev", "edu", "jobs", "shop", "payment", "crowdfunding", "media",
   "music", "sport", "transport", "medical", "realestate", "osint",
   "adult", "other",

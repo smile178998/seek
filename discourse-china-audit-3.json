@@ -1,0 +1,122 @@
+{
+  "audited_at": "2026-08-27T19:06:40.737379+00:00",
+  "method": "read-only Discourse check_email endpoint with two random negative controls; requires public hide_email_address_taken=false",
+  "passed": [
+    {
+      "name": "arducam_forum",
+      "title": "Arducam 技术支持论坛",
+      "homepage": "https://forum.arducam.com",
+      "passed": true,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": false,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.arducam.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.arducam.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    }
+  ],
+  "failed": [
+    {
+      "name": "glinet_forum",
+      "title": "GL.iNet 官方论坛",
+      "homepage": "https://forum.gl-inet.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.gl-inet.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.gl-inet.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "clockworkpi_forum",
+      "title": "ClockworkPi 社区",
+      "homepage": "https://forum.clockworkpi.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.clockworkpi.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.clockworkpi.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    },
+    {
+      "name": "luckfox_forum",
+      "title": "Luckfox Forum",
+      "homepage": "https://forum.luckfox.com",
+      "passed": false,
+      "endpoint_healthy": false,
+      "hide_email_address_taken": null,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "error": "ConnectError: [Errno 11001] getaddrinfo failed"
+        },
+        {
+          "email_domain": "outlook.com",
+          "error": "ConnectError: [Errno 11001] getaddrinfo failed"
+        }
+      ]
+    },
+    {
+      "name": "youyeetoo_forum",
+      "title": "Youyeetoo Forum",
+      "homepage": "https://forum.youyeetoo.com",
+      "passed": false,
+      "endpoint_healthy": true,
+      "hide_email_address_taken": true,
+      "observations": [
+        {
+          "email_domain": "gmail.com",
+          "status": 200,
+          "final_host": "forum.youyeetoo.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        },
+        {
+          "email_domain": "outlook.com",
+          "status": 200,
+          "final_host": "forum.youyeetoo.com",
+          "success": "OK",
+          "body": "{\"success\":\"OK\"}"
+        }
+      ]
+    }
+  ]
+}

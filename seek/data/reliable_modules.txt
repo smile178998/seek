@@ -14,9 +14,7 @@ gravatar_profile
 duolingo
 spotify
 wordpress
-mailru
 anydo
-archive
 devrant
 flickr
 lastfm
@@ -24,11 +22,16 @@ plurk
 cnblogs
 csdn
 gitee
-appinn_forum
 fit2cloud_forum
-openeuler_forum
+linux_containers_forum
+koishi_forum
+bananapi_forum
+arducam_forum
+aqara_forum
 protonmail
-wattpad
+
+# mailru / archive 可能进入账号恢复或注册流程；wattpad 缺少可靠正例夹具。
+# 三者仍保留在 full 档，但不再标记为默认可靠模块。
 
 # Holehe 补充站点
 holehe_axonaut

@@ -10,6 +10,7 @@ from ..config import Settings, get_settings
 from .base import Provider
 from .builtin import BUILTIN_FACTORIES
 from .declarative import DeclarativeProvider, build_provider_info
+from .discourse import load_discourse_providers
 from .holehe_bridge import load_holehe_providers
 from .user_scanner_bridge import load_user_scanner_providers
 
@@ -60,6 +61,7 @@ def load_providers(
         include_holehe = True
 
     providers: list[Provider] = [factory() for factory in BUILTIN_FACTORIES]
+    providers.extend(load_discourse_providers(settings.discourse_sites_file))
     definition_files = load_definition_files(settings.definitions_dir)
     definition_keys = {
         _site_key(str(spec.get("name") or path.stem))
@@ -68,7 +70,8 @@ def load_providers(
     }
 
     user_scanner_providers = load_user_scanner_providers(
-        settings.user_scanner_modules_file
+        settings.user_scanner_modules_file,
+        include_all=profile == "full",
     )
     user_scanner_keys = {
         _site_key(provider.name.removeprefix("userscanner_"))
@@ -107,7 +110,10 @@ def load_providers(
 
     if profile == "reliable":
         allow = settings.reliable_modules()
-        if allow:
+        if not allow:
+            log.error("reliable provider allowlist is empty; loading no providers")
+            providers = []
+        else:
             before = len(providers)
             providers = [
                 p

@@ -289,10 +289,17 @@ def test_user_scanner_curated_modules_load_and_map_status():
     assert "userscanner_eventbrite" in names
     assert "userscanner_amazon" in names
     assert "userscanner_x" in names
+    assert "userscanner_lespark" in names
+    assert "userscanner_netflix" in names
+    assert "userscanner_classdojo" in names
+    assert "userscanner_womanlog" in names
     assert "userscanner_made_porn" not in names
     assert "userscanner_babestation" not in names
     assert "userscanner_gumroad" not in names
     assert "userscanner_anilist" not in names
+    assert "userscanner_weverse" not in names
+    assert "userscanner_cambly" not in names
+    assert "userscanner_superlive" not in names
     assert not {
         f"userscanner_{entry.split('/', 1)[1]}" for entry in SIDE_EFFECTFUL_MODULES
     } & names
@@ -318,6 +325,31 @@ def test_user_scanner_curated_modules_load_and_map_status():
     print(f"[ok] User Scanner curated modules loaded ({len(providers)})")
 
 
+def test_full_profile_discovers_safe_upstream_modules():
+    from seek.config import Settings
+    from seek.providers.user_scanner_bridge import (
+        SIDE_EFFECTFUL_MODULES,
+        load_user_scanner_providers,
+    )
+
+    settings = Settings()
+    curated = load_user_scanner_providers(settings.user_scanner_modules_file)
+    extended = load_user_scanner_providers(
+        settings.user_scanner_modules_file, include_all=True
+    )
+    curated_names = {provider.info.name for provider in curated}
+    extended_names = {provider.info.name for provider in extended}
+    assert curated_names < extended_names
+    assert "userscanner_github" in extended_names
+    assert "userscanner_github" not in curated_names
+    assert not {
+        f"userscanner_{entry.split('/', 1)[1]}" for entry in SIDE_EFFECTFUL_MODULES
+    } & extended_names
+    github = next(p for p in extended if p.info.name == "userscanner_github")
+    assert "extended-profile candidate" in (github.info.description or "")
+    print(f"[ok] full profile discovers {len(extended)} safe User Scanner modules")
+
+
 def test_user_scanner_validator_aliases_cover_known_upstream_mismatch():
     from seek.providers.user_scanner_bridge import VALIDATOR_ALIASES
 
@@ -340,6 +372,24 @@ def test_side_effectful_user_scanner_modules_are_blocked_even_if_curated():
             for provider in load_user_scanner_providers(module_file)
         }
     assert names == {"userscanner_disqus"}
+
+
+def test_reliable_allowlist_empty_fails_closed():
+    from tempfile import TemporaryDirectory
+
+    from seek.config import Settings
+    from seek.providers.registry import load_providers
+
+    with TemporaryDirectory() as directory:
+        allowlist = Path(directory) / "empty.txt"
+        allowlist.write_text("# intentionally empty\n", encoding="utf-8")
+        providers = load_providers(
+            Settings(reliable_modules_file=allowlist),
+            profile="reliable",
+            include_holehe=False,
+        )
+    assert providers == []
+    print("[ok] empty reliable allowlist fails closed")
 
 
 def test_transient_network_error_is_retried_once():
@@ -468,49 +518,108 @@ def test_chinese_site_rules_map_only_explicit_signals():
     print("[ok] CSDN / CNBlogs / Gitee explicit status mapping")
 
 
-def test_chinese_forum_definitions_use_read_only_discourse_checks():
-    import yaml
+def test_discourse_provider_uses_live_privacy_guard():
+    from seek.config import Settings
+    from seek.providers.discourse import DiscourseProvider, load_discourse_providers
+    from seek.providers.registry import load_providers
 
-    definitions = Path(__file__).resolve().parents[1] / "seek" / "definitions"
-    expected = {
-        "appinn_forum": "https://meta.appinn.net/u/check_email.json",
-        "fit2cloud_forum": "https://bbs.fit2cloud.com/u/check_email.json",
-        "openeuler_forum": "https://forum.openeuler.org/u/check_email.json",
-    }
-    for name, url in expected.items():
-        spec = yaml.safe_load(
-            (definitions / f"{name}.yaml").read_text(encoding="utf-8")
+    def make_discourse_provider() -> DiscourseProvider:
+        return DiscourseProvider(
+            name="forum_test",
+            title="Forum Test",
+            homepage="https://forum.test",
+            audited_at="2026-08-28",
         )
-        assert spec["request"]["method"] == "GET"
-        assert spec["request"]["url"] == url
-        assert "prepare" not in spec
 
-        result = run_with_spec(
-            spec, lambda _: httpx.Response(200, json={"success": "OK"})
-        )[0]
-        assert result.status is Status.NOT_REGISTERED
+    def scan(handler):
+        async def go():
+            async with Engine(
+                [make_discourse_provider()], transport=httpx.MockTransport(handler)
+            ) as engine:
+                return (await engine.scan(EMAIL)).results[0]
 
-        result = run_with_spec(
-            spec,
-            lambda _: httpx.Response(
-                200,
-                json={
-                    "success": "failed",
-                    "errors": ["Primary email has already been taken"],
-                },
-            ),
-        )[0]
-        assert result.status is Status.REGISTERED
+        return asyncio.run(go())
 
-        result = run_with_spec(
-            spec,
-            lambda _: httpx.Response(
-                200, json={"success": "failed", "errors": ["Email is invalid"]}
-            ),
-        )[0]
-        assert result.status is Status.UNKNOWN
+    def handler_for(*, hidden: bool | None, check_payload: dict):
+        seen = {"account_check": 0}
 
-    print("[ok] Chinese Discourse forums use read-only explicit email signals")
+        def handler(request: httpx.Request) -> httpx.Response:
+            if request.url.path == "/site/settings.json":
+                payload = (
+                    {"site_settings": {"hide_email_address_taken": hidden}}
+                    if hidden is not None
+                    else {"site_settings": {}}
+                )
+                return httpx.Response(200, json=payload)
+            assert request.url.path == "/u/check_email.json"
+            assert request.url.params["email"] == EMAIL
+            seen["account_check"] += 1
+            return httpx.Response(200, json=check_payload)
+
+        return handler, seen
+
+    hidden_handler, hidden_seen = handler_for(
+        hidden=True, check_payload={"success": "OK"}
+    )
+    hidden_result = scan(hidden_handler)
+    assert hidden_result.status is Status.UNKNOWN
+    assert hidden_seen["account_check"] == 0
+
+    missing_handler, missing_seen = handler_for(
+        hidden=None, check_payload={"success": "OK"}
+    )
+    assert scan(missing_handler).status is Status.UNKNOWN
+    assert missing_seen["account_check"] == 0
+
+    available_handler, _ = handler_for(
+        hidden=False, check_payload={"success": "OK"}
+    )
+    assert scan(available_handler).status is Status.NOT_REGISTERED
+
+    taken_handler, _ = handler_for(
+        hidden=False,
+        check_payload={
+            "success": "failed",
+            "errors": ["Primary email has already been taken"],
+        },
+    )
+    assert scan(taken_handler).status is Status.REGISTERED
+
+    changed_handler, _ = handler_for(
+        hidden=False,
+        check_payload={"success": "failed", "errors": ["Email is invalid"]},
+    )
+    assert scan(changed_handler).status is Status.UNKNOWN
+
+    names = {
+        provider.info.name
+        for provider in load_discourse_providers(Settings().discourse_sites_file)
+    }
+    assert names == {
+        "aqara_forum",
+        "appinn_forum",
+        "arducam_forum",
+        "bananapi_forum",
+        "fit2cloud_forum",
+        "koishi_forum",
+        "linux_containers_forum",
+        "openeuler_forum",
+    }
+    reliable_names = {
+        provider.info.name
+        for provider in load_providers(
+            Settings(), profile="reliable", include_holehe=False
+        )
+    }
+    assert {
+        "aqara_forum",
+        "arducam_forum",
+        "bananapi_forum",
+        "fit2cloud_forum",
+        "koishi_forum",
+    } <= reliable_names
+    assert {"appinn_forum", "openeuler_forum"}.isdisjoint(reliable_names)
+    print("[ok] Discourse checks fail safely when account privacy is enabled")
 
 
 if __name__ == "__main__":

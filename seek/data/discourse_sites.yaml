@@ -1,0 +1,42 @@
+# Discourse communities handled by the guarded provider implementation.
+# The provider reads /site/settings.json before every check and only treats an
+# address as available when hide_email_address_taken is explicitly false.
+- name: appinn_forum
+  title: 小众软件社区
+  homepage: https://meta.appinn.net
+  audited_at: 2026-08-28
+
+- name: fit2cloud_forum
+  title: 飞致云社区
+  homepage: https://bbs.fit2cloud.com
+  audited_at: 2026-08-28
+
+- name: openeuler_forum
+  title: openEuler 论坛
+  homepage: https://forum.openeuler.org
+  audited_at: 2026-08-28
+
+- name: linux_containers_forum
+  title: Linux Containers Forum
+  homepage: https://discuss.linuxcontainers.org
+  audited_at: 2026-08-28
+
+- name: koishi_forum
+  title: Koishi 论坛
+  homepage: https://forum.koishi.xyz
+  audited_at: 2026-08-28
+
+- name: bananapi_forum
+  title: Banana Pi Forum
+  homepage: https://forum.banana-pi.org
+  audited_at: 2026-08-28
+
+- name: arducam_forum
+  title: Arducam 技术支持论坛
+  homepage: https://forum.arducam.com
+  audited_at: 2026-08-28
+
+- name: aqara_forum
+  title: Aqara Forum
+  homepage: https://forum.aqara.com
+  audited_at: 2026-08-28

@@ -1,4 +1,5 @@
 # seek · Email Registration Trace Lookup
+<img width="1119" height="559" alt="image" src="https://github.com/user-attachments/assets/26744594-4bb3-4fe5-a6d4-be9fa2c3ac69" />
 
 [中文](README.md) | **English**
 

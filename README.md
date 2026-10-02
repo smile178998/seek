@@ -1,4 +1,5 @@
 # seek · 邮箱注册痕迹反查
+<img width="1119" height="559" alt="image" src="https://github.com/user-attachments/assets/94d0d06d-038b-4538-bb95-d506b226da3c" />
 
 **中文** | [English](README_EN.md)
 
